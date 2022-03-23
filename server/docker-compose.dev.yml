@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=VerySekretPassword
+      - POSTGRES_DB=blogapi
+    ports:
+      - 5432:5432
+    container_name: postgres_blogapi
+    #volumes:
+    #  - ./database/db-seed.sql:/docker-entrypoint-initdb.d/database-seed.sql

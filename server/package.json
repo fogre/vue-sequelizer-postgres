@@ -1,0 +1,26 @@
+{
+  "name": "relational-db-blog",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "dev": "NODE_ENV=development nodemon ./bin/www",
+    "migration:rollback": "node database/migrationRollback.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "debug": "^4.3.4",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "express-async-errors": "^3.1.1",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
+    "pg": "^8.7.3",
+    "sequelize": "^6.17.0",
+    "umzug": "^3.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
