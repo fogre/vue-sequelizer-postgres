@@ -1,12 +1,12 @@
 const router = require('express').Router()
-const { Readinglist } = require('../database/models')
-const tokenExtractor = require('../utils/tokenExtractor')
-const { isAuthorizedUser, isResourceInDB } = require('../utils/validators')
 
-router.post('/', tokenExtractor, async (req, res) => {
-  if (!req.body.blogId || !req.body.userId) {
-    return res.status(400).json({ error: 'blog_id and user_id required' })
-  }
+const { Readinglist } = require('../database/models')
+const { confirmSession } = require('../middleware/authenticationMiddleware')
+const { isAuthorizedUser, isReqBodyValid, isResourceInDB } = require('../utils/validators')
+
+router.post('/', confirmSession, async (req, res) => {
+  isReqBodyValid(['blogId', 'userId'], req.body)
+  
   const entry = await Readinglist.create({
     userId: req.body.userId,
     blogId: req.body.blogId
@@ -14,14 +14,12 @@ router.post('/', tokenExtractor, async (req, res) => {
   res.json(entry)
 })
 
-router.put('/:id', tokenExtractor, async (req, res) => {
-  if (!req.body.read) {
-    return res.status(400).json({ error: 'read is required' })
-  }
+router.put('/:id', confirmSession, async (req, res) => {
+  isReqBodyValid('read', req.body)
 
   const entry = await Readinglist.findByPk(req.params.id)
   isResourceInDB(entry, req)
-  isAuthorizedUser(req.decodedToken, entry.userId)
+  isAuthorizedUser(req.session, entry.userId)
 
   entry.read = req.body.read
   await entry.save()

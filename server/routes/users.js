@@ -1,9 +1,13 @@
 const bcrypt = require('bcrypt')
-const router = require('express').Router();
+const router = require('express').Router()
 
-const { User, Blog } = require('../database/models');
-const tokenExtractor = require('../utils/tokenExtractor')
-const { isAuthorizedUser, isResourceInDB } = require('../utils/validators')
+const { User, Blog } = require('../database/models')
+const { confirmSession } = require('../middleware/authenticationMiddleware')
+const {
+  isAuthorizedUser,
+  isReqBodyValid,
+  isResourceInDB
+} = require('../utils/validators')
 
 router.get('/', async (req, res) => {
   const users = await User.findAll({
@@ -11,9 +15,9 @@ router.get('/', async (req, res) => {
       model: Blog,
       attributes: { exclude: ['userId'] }
     }
-  });
-  res.json(users);
-});
+  })
+  res.json(users)
+})
 
 router.get('/:id', async (req, res) => {
   const where = {}
@@ -38,16 +42,17 @@ router.get('/:id', async (req, res) => {
   
   isResourceInDB(user, req)
   return res.json(user)
-});
+})
 
 router.post('/', async (req, res) => {
-  const { username, name, password } = req.body;
-  const passwordHash = await bcrypt.hash(password, 10);
+  isReqBodyValid(['username', 'name', 'password'], req.body)
+  const { username, name, password } = req.body
+  const passwordHash = await bcrypt.hash(password, 10)
   const user = await User.create({
     username,
     name,
     passwordHash
-  });
+  })
 
   res.json({
     id: user.id,
@@ -55,21 +60,19 @@ router.post('/', async (req, res) => {
     name: user.name,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt
-  });
-});
+  })
+})
 
-router.put('/:username', tokenExtractor, async (req, res) => {
-  if (!req.body.username) {
-    return res.status(400).json({ error: 'Missing new username' });
-  }
+router.put('/:username', confirmSession, async (req, res) => {
+  isReqBodyValid('username', req.body)
 
-  const user = User.findOne({ where: { username: req.params.username } });
+  const user = User.findOne({ where: { username: req.params.username } })
   isResourceInDB(user, req)
-  isAuthorizedUser(req.decodedToken.id, user.id)
-  user.username = req.body.username;
-  await user.save();
-  res.json(user);
+  isAuthorizedUser(req.session, user.id)
+  user.username = req.body.username
+  await user.save()
+  res.json(user)
 
-});
+})
 
 module.exports = router;

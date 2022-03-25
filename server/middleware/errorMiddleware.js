@@ -1,32 +1,11 @@
-class CustomError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = this.constructor.name;
-    Error.captureStackTrace(this, this.constructor)
-  }
-}
-
-class BadRequest extends CustomError {
-  constructor(resource, query) {
-    super(`Resource ${resource} was not found.`)
-    this.data = { resource, query }
-  }
-}
-
-class UnauthorizedRequest extends CustomError {
-  constructor(resource, query) {
-    super(`Unauthorized to perform this action`)
-    this.data = { resource, query }
-  }
-}
-
 const errorHandler = (error, req, res, next) => {
-  console.log(error);
+  console.log(error)
   
   switch(error.name) {
     case 'BadRequest':
-    case 'SequelizeValidationError':
+    case 'MissingRequiredFields':
     case 'SequelizeUniqueConstraintError':
+    case 'SequelizeValidationError':
       return res.status(400).json({ error: error.message })
     case 'UnauthorizedRequest':
       return res.status(401).json({ error: error.message })
@@ -44,8 +23,6 @@ const unknownEndpoint = (req, res) => {
 }
 
 module.exports = {
-  BadRequest,
   errorHandler,
-  UnauthorizedRequest,
   unknownEndpoint
 }

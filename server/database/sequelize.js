@@ -2,6 +2,7 @@ const { Sequelize } = require('sequelize')
 const { Umzug, SequelizeStorage } = require('umzug')
 
 const { DATABASE_URL, ENV } = require('../utils/config');
+
 const sequelize = new Sequelize(DATABASE_URL);
 
 const migrationConf = {
@@ -15,24 +16,25 @@ const migrationConf = {
   logger: console
 }
 
+const seedingConf = {
+  migrations: {
+    glob: ['seeders/*.js', { cwd: __dirname }],
+  },
+  context: sequelize.getQueryInterface(),
+  storage: new SequelizeStorage({
+    sequelize, tableName: 'seeder_meta',
+  }),
+  logger: console,
+}
+
 const seedDatabase = async () => {
-  if (ENV !== 'development') {
+  if (ENV !== 'development' && ENV !== 'testing') {
     return
   }
-  const uzmug = new Umzug({
-    migrations: {
-      glob: ['seeders/*.js', { cwd: __dirname }],
-    },
-    context: sequelize,
-    storage: new SequelizeStorage({
-      sequelize,
-      tableName: 'seeder_meta',
-    }),
-    logger: console,
-  });
+  const uzmug = new Umzug(seedingConf)
   const seedings = await uzmug.up()
   console.log('Seedings up to date', {
-    files: seedings.map(mig => mig.name)
+    files: seedings.map(seed => seed.name)
   })
 }
 

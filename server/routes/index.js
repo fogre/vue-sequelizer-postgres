@@ -1,10 +1,9 @@
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router()
 
 router.get('/', async (req, res) => {
-  res.send({
+  res.json({
     foo: 'bar'
   })
-});
+})
 
-module.exports = router;
+module.exports = router

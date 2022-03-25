@@ -1,3 +1,3 @@
-const { rollbackMigration } = require('./sequelize')
+const { rollbackMigration } = require('./umzug')
 
 rollbackMigration()

@@ -58,14 +58,14 @@ const blogs = [
 ]
 
 module.exports = {
-  up: async ({ context: sequelize }) => {
+  up: async ({ context: queryInterface }) => {
     const users = await usersGenerator()
-    await sequelize.getQueryInterface().bulkInsert('users', users)
-    await sequelize.getQueryInterface().bulkInsert('blogs', blogs)
+    await queryInterface.bulkInsert('users', users)
+    await queryInterface.bulkInsert('blogs', blogs)
   },
 
-  down: async ({ context: sequelize }) => {
-    await sequelize.getQueryInterface().bulkDelete('users', { id:  [1,2,3,4] })
-    await sequelize.getQueryInterface().bulkDelete('blogs', { id: blogs.map((b,i) => i+1 })
+  down: async ({ context: queryInterface }) => {
+    await queryInterface.bulkDelete('users', { id:  [1,2,3,4] })
+    await queryInterface.bulkDelete('blogs', { id: [1,2,3,4] })
   }
 }

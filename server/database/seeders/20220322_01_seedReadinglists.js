@@ -10,11 +10,11 @@ const entrys = [
 ]
 
 module.exports = {
-  up: async ({ context: sequelize }) => {
-    await sequelize.getQueryInterface().bulkInsert('readinglists', entrys)
+  up: async ({ context: queryInterface }) => {
+    await queryInterface.bulkInsert('readinglists', entrys)
   },
 
-  down: async ({ context: sequelize }) => {
-    await sequelize.getQueryInterface().bulkDelete('readinglists', { id:  entrys.map(i => i.id) })
+  down: async ({ context: queryInterface }) => {
+    await queryInterface.bulkDelete('readinglists', { id:  entrys.map(i => i.id) })
   }
 }
