@@ -1,9 +1,11 @@
 const { Sequelize } = require('sequelize')
 const { Umzug, SequelizeStorage } = require('umzug')
 
-const { DATABASE_URL, ENV } = require('../utils/config');
+const { DATABASE_URL, ENV } = require('../utils/config')
 
-const sequelize = new Sequelize(DATABASE_URL);
+const sequelize = new Sequelize(DATABASE_URL, {
+  logging: () => ENV === 'development' ? true : false
+})
 
 const migrationConf = {
   migrations: {
@@ -28,13 +30,32 @@ const seedingConf = {
 }
 
 const seedDatabase = async () => {
-  if (ENV !== 'development' && ENV !== 'testing') {
-    return
+  if (ENV === 'development' || ENV === 'test') {
+    const uzmug = new Umzug(seedingConf)
+    const seedings = await uzmug.up()
+    console.log('Seedings up to date', {
+      files: seedings.map(seed => seed.name)
+    })
   }
-  const uzmug = new Umzug(seedingConf)
-  const seedings = await uzmug.up()
-  console.log('Seedings up to date', {
-    files: seedings.map(seed => seed.name)
+  return null
+}
+
+const rollbackSeeding = async () => {
+  try {
+    await sequelize.authenticate()
+    const uzmug = new Umzug(seedingConf)
+    await uzmug.down()
+  } catch(e) {
+    console.log('Migration rollback failed: ', e)
+    return process.exit(1)
+  }
+}
+
+const runMigrations = async () => {
+  const uzmugMigrator = new Umzug(migrationConf)
+  const migrations = await uzmugMigrator.up()
+  console.log('Migrations up to date', {
+    files: migrations.map(mig => mig.name)
   })
 }
 
@@ -46,15 +67,7 @@ const rollbackMigration = async () => {
   } catch(e) {
     console.log('Migration rollback failed: ', e)
     return process.exit(1)
-  }  
-}
-
-const runMigrations = async () => {
-  const uzmugMigrator = new Umzug(migrationConf)
-  const migrations = await uzmugMigrator.up()
-  console.log('Migrations up to date', {
-    files: migrations.map(mig => mig.name)
-  })
+  }
 }
 
 const connectToDatabase = async () => {
@@ -70,4 +83,9 @@ const connectToDatabase = async () => {
   return null
 }
 
-module.exports = { sequelize, connectToDatabase }
+module.exports = {
+  sequelize,
+  connectToDatabase,
+  rollbackSeeding,
+  rollbackMigration
+}

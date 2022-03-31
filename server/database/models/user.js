@@ -16,26 +16,42 @@ User.init({
       msg: 'This username is already taken.',
       fields: ['username']
     },
-    allowNull: false
+    allowNull: false,
+    notEmpty: true,
+    validate: {
+      len: [3,16],
+    }
   },
   name: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
+    notEmpty: true
   },
   passwordHash: {
     type: DataTypes.STRING,
     allowNull: false
+  },
+  disabled: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  admin: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
   }
 }, {
   sequelize,
   underscored: true,
   modelName: 'user',
   defaultScope: {
-    attributes: { exclude: ['passwordHash'] }
+    attributes: { exclude: ['passwordHash', 'disabled', 'admin'] }
   },
   scopes: {
-    withHash: {
-      attributes: { include: ['passwordHash'] }
+    withLogin: {
+      attributes: { include: ['passwordHash', 'disabled'] }
+    },
+    withAdmin: {
+      attributes: { include: ['admin'] }
     }
   }
 })

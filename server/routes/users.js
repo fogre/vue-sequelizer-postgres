@@ -39,7 +39,7 @@ router.get('/:id', async (req, res) => {
       }
     ]
   })
-  
+
   isResourceInDB(user, req)
   return res.json(user)
 })
@@ -75,4 +75,4 @@ router.put('/:username', confirmSession, async (req, res) => {
 
 })
 
-module.exports = router;
+module.exports = router

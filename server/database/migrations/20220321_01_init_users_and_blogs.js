@@ -10,15 +10,12 @@ module.exports = {
       },
       username: {
         type: DataTypes.STRING,
-        unique: {
-          msg: 'This username is already taken.',
-          fields: ['username']
-        },
-        allowNull: false
+        unique: true,
+        allowNull: false,
       },
       name: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       password_hash: {
         type: DataTypes.STRING,
@@ -37,11 +34,13 @@ module.exports = {
       },
       url: {
         type: DataTypes.TEXT,
-        allowNull: false
+        allowNull: false,
+        unique: true
       },
       title: {
         type: DataTypes.TEXT,
-        allowNull: false
+        allowNull: false,
+        unique: true
       },
       likes: {
         type: DataTypes.INTEGER,
@@ -55,7 +54,7 @@ module.exports = {
       references: { model: 'users', key: 'id' }
     })
   },
-  
+
   down: async({ context: queryInterface }) => {
     await queryInterface.dropTable('users')
     await queryInterface.dropTables('blogs')

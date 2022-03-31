@@ -2,7 +2,6 @@ const bcrypt = require('bcrypt')
 const router = require('express').Router()
 
 const { User } = require('../database/models')
-const { SECRET } = require('../utils/config')
 const { isReqBodyValid } = require('../utils/validators')
 
 router.post('/', async (req, res) => {
@@ -10,7 +9,7 @@ router.post('/', async (req, res) => {
   const { username, password } = req.body
 
   const user = await User
-    .scope('withHash')
+    .scope('withLogin')
     .findOne({ where: { username: username } })
 
   const passwordCorrect = user === null
@@ -20,6 +19,12 @@ router.post('/', async (req, res) => {
   if (!(user && passwordCorrect)) {
     return res.status(401).json({
       error: 'invalid username or password'
+    })
+  }
+
+  if (user.disabled) {
+    return res.status(401).json({
+      error: 'account disabled, please contact administration'
     })
   }
 

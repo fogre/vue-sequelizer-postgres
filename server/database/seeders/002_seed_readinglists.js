@@ -15,6 +15,6 @@ module.exports = {
   },
 
   down: async ({ context: queryInterface }) => {
-    await queryInterface.bulkDelete('readinglists', { id:  entrys.map(i => i.id) })
+    await queryInterface.bulkDelete('readinglists', { id: [1, 2] })
   }
 }

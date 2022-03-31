@@ -1,7 +1,7 @@
 class CustomError extends Error {
   constructor(message) {
-    super(message);
-    this.name = this.constructor.name;
+    super(message)
+    this.name = this.constructor.name
     Error.captureStackTrace(this, this.constructor)
   }
 }
@@ -15,7 +15,7 @@ class BadRequest extends CustomError {
 
 class UnauthorizedRequest extends CustomError {
   constructor(resource, query) {
-    super(`Unauthorized`)
+    super('Unauthorized')
     this.data = { resource, query }
   }
 }

@@ -12,12 +12,12 @@ const isReqBodyValid = (requiredParams, body) => {
   const  errors = []
   if (Array.isArray(requiredParams)) {
     requiredParams.forEach(param => {
-      if (!body[param]) {
+      if (!body[param] && body[param] !== 0) {
         errors.push(param)
       }
     })
   } else {
-    if (!body[requiredParams]) {
+    if (!body[requiredParams] && body[requiredParams] !== 0) {
       errors.push(requiredParams)
     }
   }
@@ -31,7 +31,7 @@ const isReqBodyValid = (requiredParams, body) => {
 
 //Entry:Model in db, req: request
 const isResourceInDB = (entry, req) => {
-  if (!entry) {
+  if (!entry || Array.isArray(entry) && !entry.length) {
     throw new BadRequest(req.originalUrl)
   }
   return true

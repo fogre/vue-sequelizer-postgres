@@ -9,10 +9,10 @@ const createdAndUpdatedAt = {
 }
 
 const usersGenerator = async () => {
-  const names = ['admin', 'root', 'defaultUser', 'testUser']
+  const names = ['admin', 'root', 'defaultUser', 'testUser', 'disabledUser']
   const usersToFeed = []
+  const hash = await bcrypt.hash(DEFAULT_PASS, 10)
   for (const name of names) {
-    const hash = await bcrypt.hash(DEFAULT_PASS, 10)
     const u = {
       username: name,
       name: name,
@@ -21,12 +21,13 @@ const usersGenerator = async () => {
     }
     usersToFeed.push(u)
   }
+  usersToFeed[usersToFeed.length-1].disabled = true
+  usersToFeed[0].admin = true
   return usersToFeed
 }
 
 const blogBaseObject = {
   user_id: 3,
-  url: 'https://fullstackopen.com',
   ...createdAndUpdatedAt
 }
 
@@ -35,24 +36,28 @@ const blogs = [
     title: 'Miksi minusta tuli niin komea',
     author: 'Fre Derik',
     likes: 12,
+    url: 'https://fullstackopen.com/1',
     ...blogBaseObject
   },
   {
     title: 'Love and Laces in literature',
     author: 'Ada Lovelace',
     likes: 4,
+    url: 'https://fullstackopen.com/2',
     ...blogBaseObject
   },
   {
     title: 'Why dont people believe I am a human?',
     author: 'NotATuring Machine',
     likes: 7,
+    url: 'https://fullstackopen.com/3',
     ...blogBaseObject
   },
   {
     title: 'Why not hee hee your whole life?',
     author: 'Michael Jackson',
     likes: 0,
+    url: 'https://fullstackopen.com/4',
     ...blogBaseObject
   }
 ]
@@ -65,7 +70,7 @@ module.exports = {
   },
 
   down: async ({ context: queryInterface }) => {
-    await queryInterface.bulkDelete('users', { id:  [1,2,3,4] })
     await queryInterface.bulkDelete('blogs', { id: [1,2,3,4] })
+    await queryInterface.bulkDelete('users', { id:  [1,2,3,4, 5] })
   }
 }

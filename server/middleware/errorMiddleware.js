@@ -1,20 +1,20 @@
+const { ENV } = require('../utils/config')
+
 const errorHandler = (error, req, res, next) => {
-  console.log(error)
-  
+  if(ENV === 'development') {
+    console.log(error)
+  }
+
   switch(error.name) {
-    case 'BadRequest':
-    case 'MissingRequiredFields':
-    case 'SequelizeUniqueConstraintError':
-    case 'SequelizeValidationError':
-      return res.status(400).json({ error: error.message })
-    case 'UnauthorizedRequest':
-      return res.status(401).json({ error: error.message })
-    case'JsonWebTokenError':
-      return res.status(401).json({ error: 'invalid token' })
-    case 'TokenExpiredError':
-      return res.status(401).json({ error: 'token expired' })
-    default:
-      next(error)
+  case 'BadRequest':
+  case 'MissingRequiredFields':
+  case 'SequelizeUniqueConstraintError':
+  case 'SequelizeValidationError':
+    return res.status(400).json({ error: error.message })
+  case 'UnauthorizedRequest':
+    return res.status(401).json({ error: error.message })
+  default:
+    next(error)
   }
 }
 

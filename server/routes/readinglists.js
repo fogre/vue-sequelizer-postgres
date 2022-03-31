@@ -6,9 +6,10 @@ const { isAuthorizedUser, isReqBodyValid, isResourceInDB } = require('../utils/v
 
 router.post('/', confirmSession, async (req, res) => {
   isReqBodyValid(['blogId', 'userId'], req.body)
-  
+  isAuthorizedUser(req.session, req.body.userId)
+
   const entry = await Readinglist.create({
-    userId: req.body.userId,
+    userId: req.session.userId,
     blogId: req.body.blogId
   })
   res.json(entry)

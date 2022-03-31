@@ -11,8 +11,17 @@ services:
     ports:
       - 5432:5432
     container_name: postgres_blogapi
-    #volumes:
-    #  - ./database/db-seed.sql:/docker-entrypoint-initdb.d/database-seed.sql
+
+  postgres-test:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=VerySekretPassword
+      - POSTGRES_DB=blogapitest
+    ports:
+      - 5433:5432
+    container_name: postgres_blogapi_test
 
   redis:
     image: "redis:alpine"

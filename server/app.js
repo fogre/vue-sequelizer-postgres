@@ -1,22 +1,27 @@
-const express = require('express');
+const express = require('express')
 const logger = require('morgan')
 const cors = require('cors')
 require('express-async-errors')
+require('pg').defaults.parseInt8 = true
 
 const { connectToDatabase } = require('./database/sequelize')
 const errorMiddleware = require('./middleware/errorMiddleware')
 const { redisSessionStorage } = require('./utils/redisSession')
+const { PORT, ENV } = require('./utils/config')
 
 const authorsRouter = require('./routes/authors')
 const blogsRouter = require('./routes/blogs')
 const indexRouter = require('./routes/index')
 const loginRouter = require('./routes/login')
 const readinglistsRouter = require('./routes/readinglists')
+const tagsRouter = require('./routes/tags')
 const usersRouter =  require('./routes/users')
 
 const app = express()
 app.use(cors())
-app.use(logger('dev'))
+if (ENV !== 'test') {
+  app.use(logger('dev'))
+}
 app.use(express.json())
 app.use(redisSessionStorage)
 
@@ -25,19 +30,21 @@ app.use('/api/authors', authorsRouter)
 app.use('/api/blogs', blogsRouter)
 app.use('/api/login', loginRouter)
 app.use('/api/readinglists', readinglistsRouter)
+app.use('/api/tags', tagsRouter)
 app.use('/api/users', usersRouter)
 
 app.use(errorMiddleware.unknownEndpoint)
 app.use(errorMiddleware.errorHandler)
 
-const connectDB = async () => {
+const start = async () => {
   await connectToDatabase()
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`)
+  })
 }
 
-connectDB()
+if (ENV !== 'test') {
+  start()
+}
 
-
-
-
-
-module.exports = app;
+module.exports = app

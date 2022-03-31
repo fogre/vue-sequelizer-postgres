@@ -16,7 +16,11 @@ const redisClient = redis.createClient({
 
 redisClient
   .connect()
-  .then(() => console.log('Redis client connected'))
+  .then(() => {
+    if (ENV !== 'test') {
+      console.log('Redis client connected')
+    }
+  })
   .catch(e => console.log(e))
 
 const redisSessionStorage = session({
@@ -33,5 +37,6 @@ const redisSessionStorage = session({
 })
 
 module.exports = {
+  redisClient,
   redisSessionStorage
 }

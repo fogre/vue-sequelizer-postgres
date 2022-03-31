@@ -1,6 +1,6 @@
-const router = require('express').Router();
-const { sequelize } = require('../database/sequelize');
-const { Blog } = require('../database/models');
+const router = require('express').Router()
+const { sequelize } = require('../database/sequelize')
+const { Blog } = require('../database/models')
 
 router.get('/', async (req,res) => {
   const blogs = await Blog.findAll({
@@ -13,8 +13,8 @@ router.get('/', async (req,res) => {
     order: [
       [sequelize.fn('MAX', sequelize.col('likes')), 'DESC']
     ]
-  });
-  res.json(blogs);
-});
+  })
+  res.json(blogs)
+})
 
 module.exports = router

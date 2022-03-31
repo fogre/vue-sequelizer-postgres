@@ -1,6 +1,6 @@
 const { Op } = require('sequelize')
 const router = require('express').Router()
-const { User, Blog } = require('../database/models')
+const { User, Blog, Tag, Readinglist, Taglist } = require('../database/models')
 
 const { confirmSession } = require('../middleware/authenticationMiddleware')
 const { isAuthorizedUser, isReqBodyValid, isResourceInDB } = require('../utils/validators')
@@ -14,16 +14,21 @@ const blogFinder = async (req, res, next) => {
 router.get('/', async (req, res) => {
   const where = {}
 
-  if (req.query.search) {
+  if (req.query.search || req.query.author) {
     where[Op.or] = [
       {
         author: {
-          [Op.substring]: req.query.search
+          [Op.iLike]: `%${req.query.author}%`
         }
       },
       {
         title: {
-          [Op.substring]: req.query.search
+          [Op.iLike]: `%${req.query.search}%`
+        }
+      },
+      {
+        url: {
+          [Op.iLike]: `%${req.query.search}%`
         }
       }
     ]
@@ -48,15 +53,34 @@ router.get('/:id', blogFinder, async (req, res) => {
 })
 
 router.post('/', confirmSession, async (req, res) => {
-  const user = await User.findByPk(req.session.userId)
+  isReqBodyValid(['title', 'url'], req.body)
+  const { author, title, url, tags } = req.body
+  let tagsInDB
+
   const blog = await Blog.create({
-    ...req.body,
-    userId: user.id
+    title,
+    url,
+    author: author || null,
+    userId: req.session.userId
   })
-  res.json(blog)
+
+  if (tags) {
+    if (!Array.isArray(tags)) {
+      return res.status(400).json({ error: 'tags should be an array' })
+    }
+    tagsInDB = await Tag.findAll({
+      where: { id: tags.map(t => t.id) },
+      raw: true
+    })
+    isResourceInDB(tagsInDB, req)
+    await Taglist.bulkCreate(tagsInDB.map(t => {
+      return { blogId: blog.id, tagId: t.id }
+    }))
+  }
+  res.json({ blog, tags: tagsInDB })
 })
 
-router.put('/:id', confirmSession, blogFinder, async(req, res) => {
+router.put('/:id/likes', confirmSession, blogFinder, async(req, res) => {
   isReqBodyValid('likes', req.body)
   req.blog.likes = req.blog.likes + req.body.likes
   const updatedBlog = await req.blog.save()
@@ -65,9 +89,11 @@ router.put('/:id', confirmSession, blogFinder, async(req, res) => {
 
 router.delete('/:id', confirmSession, blogFinder, async (req, res) => {
   isAuthorizedUser(req.session, req.blog.userId)
+  const findOptions = { where: { blogId: req.blog.id } }
+  await Readinglist.destroy(findOptions)
+  await Taglist.destroy(findOptions)
   await req.blog.destroy()
   res.status(204).end()
 })
 
-
-module.exports = router;
+module.exports = router
