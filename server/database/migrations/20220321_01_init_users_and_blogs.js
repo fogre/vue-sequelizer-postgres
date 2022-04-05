@@ -44,7 +44,8 @@ module.exports = {
       },
       likes: {
         type: DataTypes.INTEGER,
-        defaultValue: 0
+        defaultValue: 0,
+        allowNull: false
       }
     })
 

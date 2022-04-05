@@ -15,6 +15,7 @@ describe('When using route /api/login', () => {
       expect(res.headers['set-cookie'].length).toBeTruthy()
       expect(res.headers['set-cookie'].find(c => c.includes('sessionId='))).toBeTruthy()
       expect(res.body.username).toBe('testUser')
+      expect(res.body.passwordHash).toBeFalsy()
     })
 
     test('it sends correct error with wrong credentials', async () => {

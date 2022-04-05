@@ -18,12 +18,14 @@ const tagsRouter = require('./routes/tags')
 const usersRouter =  require('./routes/users')
 
 const app = express()
+app.use(redisSessionStorage)
+app.use(errorMiddleware.checkSessionConnection)
 app.use(cors())
+app.use(express.json())
+
 if (ENV !== 'test') {
   app.use(logger('dev'))
 }
-app.use(express.json())
-app.use(redisSessionStorage)
 
 app.use('/', indexRouter)
 app.use('/api/authors', authorsRouter)

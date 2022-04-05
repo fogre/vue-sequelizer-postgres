@@ -2,9 +2,7 @@ const validators = require('../../utils/validators')
 const errors = require('../../utils/customErrors')
 
 describe('The validator', () => {
-
   describe('isAuthorizedUser', () => {
-
     test('throws correct error if unauthorized', () => {
       const session = { userId: 1 }
       const userId = 2
@@ -21,7 +19,6 @@ describe('The validator', () => {
   })
 
   describe('isReqBodyValid', () => {
-
     test('throws correct error for invalid body', () => {
       let required = ['name', 'id', 'social']
       let body = { name: 'asd', id: 1 }
@@ -46,7 +43,6 @@ describe('The validator', () => {
   })
 
   describe('isResourceInDB', () => {
-
     test('throws correct error if resource not found', () => {
       expect(() =>
         validators.isResourceInDB(undefined, { originalUrl: 'asd' })
@@ -56,6 +52,24 @@ describe('The validator', () => {
     test('returns true if resource found', () => {
       expect(
         validators.isResourceInDB({ iExists: true }, { originalUrl: 'asd' })
+      ).toBe(true)
+    })
+  })
+
+  describe('isAdmin', () => {
+    test('throws correct error if !session.admin', () => {
+      expect(() =>
+        validators.isAdmin({ userId: 1, username: 'adddd' })
+      ).toThrow(errors.UnauthorizedRequest)
+
+      expect(() =>
+        validators.isAdmin({ admin: false })
+      ).toThrow(errors.UnauthorizedRequest)
+    })
+
+    test('returns true if session.auth exists', () => {
+      expect(
+        validators.isAdmin({ userId: 1, username: 'adddd', admin: true })
       ).toBe(true)
     })
   })

@@ -57,9 +57,14 @@ router.post('/', confirmSession, async (req, res) => {
   const { author, title, url, tags } = req.body
   let tagsInDB
 
+  let parsedUrl = url.replace(/^https?:\/\//, '')
+  if (!parsedUrl.startsWith('www.')) {
+    parsedUrl = `www.${parsedUrl}`
+  }
+
   const blog = await Blog.create({
     title,
-    url,
+    url: parsedUrl,
     author: author || null,
     userId: req.session.userId
   })

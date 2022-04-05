@@ -1,7 +1,14 @@
 const { BadRequest, UnauthorizedRequest, MissingRequiredFields } = require('./customErrors')
 
+const isAdmin = session => {
+  if (!session.admin) {
+    throw new UnauthorizedRequest
+  }
+  return true
+}
+
 const isAuthorizedUser = (session, userId) => {
-  if (session.userId !== userId) {
+  if (session.userId !== userId && !session.admin) {
     throw new UnauthorizedRequest
   }
   return true
@@ -12,12 +19,12 @@ const isReqBodyValid = (requiredParams, body) => {
   const  errors = []
   if (Array.isArray(requiredParams)) {
     requiredParams.forEach(param => {
-      if (!body[param] && body[param] !== 0) {
+      if (!body[param] && isNaN(body[param])) {
         errors.push(param)
       }
     })
   } else {
-    if (!body[requiredParams] && body[requiredParams] !== 0) {
+    if (!body[requiredParams] && isNaN(body[requiredParams])) {
       errors.push(requiredParams)
     }
   }
@@ -38,6 +45,7 @@ const isResourceInDB = (entry, req) => {
 }
 
 module.exports = {
+  isAdmin,
   isAuthorizedUser,
   isReqBodyValid,
   isResourceInDB

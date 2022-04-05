@@ -17,15 +17,17 @@ User.init({
       fields: ['username']
     },
     allowNull: false,
-    notEmpty: true,
     validate: {
-      len: [3,16],
+      len: [4,16],
+      notEmpty: true
     }
   },
   name: {
     type: DataTypes.STRING,
     allowNull: false,
-    notEmpty: true
+    validate: {
+      notEmpty: true
+    }
   },
   passwordHash: {
     type: DataTypes.STRING,
@@ -48,7 +50,7 @@ User.init({
   },
   scopes: {
     withLogin: {
-      attributes: { include: ['passwordHash', 'disabled'] }
+      attributes: { include: ['passwordHash', 'admin', 'disabled'] }
     },
     withAdmin: {
       attributes: { include: ['admin'] }

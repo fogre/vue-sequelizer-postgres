@@ -13,13 +13,13 @@ Tag.init({
   name: {
     type: DataTypes.TEXT,
     allowNull: false,
-    notEmpty: true,
     unique: {
       msg: 'Tag with this name already exists',
       fields: ['name']
     },
     validate: {
-      len: [2,10]
+      len: [2,10],
+      notEmpty: true
     }
   }
 }, {

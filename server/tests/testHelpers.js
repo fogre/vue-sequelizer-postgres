@@ -1,19 +1,23 @@
 const { DEFAULT_PASS } = require('../utils/config')
 
-//Log in users and return session cookies
-const logInAndGetSessionCookies = async api => {
+const getSessionCookie = async (api, username) => {
   const res = await api
     .post('/api/login')
-    .send({ username: 'testUser', password: DEFAULT_PASS })
-  const testUserCookie = res.headers['set-cookie'].find(c => c.includes('sessionId='))
+    .send({
+      username,
+      password: DEFAULT_PASS
+    })
+  return res.headers['set-cookie'].find(c => c.includes('sessionId='))
+}
 
-  const res2 = await api
-    .post('/api/login')
-    .send({ username: 'defaultUser', password: DEFAULT_PASS })
-  const defaultUserCookie = res2.headers['set-cookie'].find(c => c.includes('sessionId='))
+//Log in users and return session cookies
+const logInAndGetSessionCookies = async api => {
+  const testUserCookie = await getSessionCookie(api, 'testUser')
+  const defaultUserCookie = await getSessionCookie(api, 'defaultUser')
   return { testUserCookie, defaultUserCookie }
 }
 
 module.exports = {
+  getSessionCookie,
   logInAndGetSessionCookies
 }

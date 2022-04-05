@@ -22,7 +22,15 @@ const unknownEndpoint = (req, res) => {
   res.status(404).send({ error: 'unknown endpoint' })
 }
 
+const checkSessionConnection = (req, res, next) => {
+  if (!req.session) {
+    return next(new Error('connection to redisSession lost'))
+  }
+  next()
+}
+
 module.exports = {
+  checkSessionConnection,
   errorHandler,
   unknownEndpoint
 }

@@ -1,9 +1,12 @@
 const bcrypt = require('bcrypt')
 const router = require('express').Router()
 
+const { sequelize } = require('../database/sequelize')
 const { User, Blog } = require('../database/models')
 const { confirmSession } = require('../middleware/authenticationMiddleware')
+const { setAsBanned } = require('../utils/redisSession')
 const {
+  isAdmin,
   isAuthorizedUser,
   isReqBodyValid,
   isResourceInDB
@@ -11,10 +14,20 @@ const {
 
 router.get('/', async (req, res) => {
   const users = await User.findAll({
-    include: {
-      model: Blog,
-      attributes: { exclude: ['userId'] }
-    }
+    attributes: {
+      include: [
+        [sequelize.fn('COUNT', sequelize.col('blogs.id')), 'blogCount'],
+        [sequelize.fn('SUM', sequelize.col('blogs.likes')), 'blogLikes'],
+        [sequelize.fn('AVG', sequelize.col('blogs.likes')), 'averageLikes']
+      ]
+    },
+    include: [{
+      model: Blog, attributes: [],
+    }],
+    group: ['user.id'],
+    order: [
+      [sequelize.fn('MAX', sequelize.col('likes')), 'DESC NULLS LAST']
+    ]
   })
   res.json(users)
 })
@@ -22,7 +35,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const where = {}
 
-  if (req.query.read || req.query.read === false) {
+  if (req.query.read || typeof req.query.read === 'boolean') {
     where.read = req.query.read
   }
   const user = await User.findByPk(req.params.id, {
@@ -44,15 +57,25 @@ router.get('/:id', async (req, res) => {
   return res.json(user)
 })
 
+//create user and login
 router.post('/', async (req, res) => {
   isReqBodyValid(['username', 'name', 'password'], req.body)
   const { username, name, password } = req.body
+
+  if (password.length < 6) {
+    return res.status(400).json({
+      error: 'Password must be over 6 characters'
+    })
+  }
   const passwordHash = await bcrypt.hash(password, 10)
   const user = await User.create({
     username,
     name,
     passwordHash
   })
+
+  req.session.userId = user.id
+  req.session.username = user.username
 
   res.json({
     id: user.id,
@@ -63,16 +86,27 @@ router.post('/', async (req, res) => {
   })
 })
 
+//username update
 router.put('/:username', confirmSession, async (req, res) => {
   isReqBodyValid('username', req.body)
-
-  const user = User.findOne({ where: { username: req.params.username } })
+  const user = await User.findOne({ where: { username: req.params.username } })
   isResourceInDB(user, req)
   isAuthorizedUser(req.session, user.id)
   user.username = req.body.username
   await user.save()
   res.json(user)
+})
 
+//disable user
+router.put('/:id/disable', confirmSession, async (req, res) => {
+  isAdmin(req.session)
+  isReqBodyValid('disabled', req.body)
+  const user = await User.findByPk(req.params.id)
+  isResourceInDB(user, req)
+  user.disabled = req.body.disabled
+  await user.save()
+  await setAsBanned(user.id)
+  res.json({ disabled: user.disabled })
 })
 
 module.exports = router
