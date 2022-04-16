@@ -1,5 +1,5 @@
 <template>
-	<div class="info-wrapper">
+  <div class="info-wrapper">
     <div class="info-content">
       <h3 class="header">Blog <span>-</span> Collect <span>-</span> Like</h3>
       <p>Bloglist is the ultimate social blog listing site!</p>
@@ -12,7 +12,7 @@
 </template>
 
 <style scoped>
-	 .info-wrapper {
+   .info-wrapper {
     height: 600px;
     width: 100vw;
     background-color: white;
@@ -27,14 +27,14 @@
     text-align: center;
 
     & h3 {
-    	color: var(--color-secondary);
-  		font-size: calc(1.5rem + 1vw);
-  		padding-bottom: var(--padding-main);
+      color: var(--color-secondary);
+      font-size: calc(1.5rem + 1vw);
+      padding-bottom: var(--padding-main);
 
-  		& span {
-  			font-size: calc(1.5rem + 1vw);
-  			color: black;
-  		}
+      & span {
+        font-size: calc(1.5rem + 1vw);
+        color: black;
+      }
     }
   }
 </style>
