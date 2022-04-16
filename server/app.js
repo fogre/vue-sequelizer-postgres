@@ -20,7 +20,14 @@ const usersRouter =  require('./routes/users')
 const app = express()
 app.use(redisSessionStorage)
 app.use(errorMiddleware.checkSessionConnection)
-app.use(cors())
+app.use(cors({
+  origin: [
+    "http://localhost:3000",
+    "http://localhost:3001",
+  ],
+  exposedHeaders: ["set-cookie"],
+  credentials: true
+}))
 app.use(express.json())
 
 if (ENV !== 'test') {

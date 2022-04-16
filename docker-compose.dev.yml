@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  api:
+    image: bloglist-backend-dev
+    build:
+      context: ./server/
+      dockerfile: dev.Dockerfile
+    volumes:
+      - ./server:/usr/src/app
+    ports:
+      - 3001:3001
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      - DATABASE_URL=postgres://postgres:VerySekretPassword@postgres_blogapi:5432/blogapi
+      - REDIS_URL=redis://redis_blogapi:6379/
+      - SECRET=SomeVerySekretSecret
+      - PORT=3001
+    
+  postgres:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=VerySekretPassword
+      - POSTGRES_DB=blogapi
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    container_name: postgres_blogapi
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - 6379:6379
+    command: ['redis-server']
+    container_name: redis_blogapi

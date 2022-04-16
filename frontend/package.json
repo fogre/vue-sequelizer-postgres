@@ -1,0 +1,27 @@
+{
+  "name": "bloglist-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@formkit/vue": "^1.0.0-beta.6",
+    "axios": "^0.26.1",
+    "vue": "^3.2.31",
+    "vue-query": "^1.22.2",
+    "vue-router": "^4.0.14"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^2.3.1",
+    "postcss-nesting": "^10.1.4",
+    "vite": "^2.9.1"
+  },
+  "postcss": {
+    "plugins": {
+      "postcss-nesting": true
+    }
+  }
+}

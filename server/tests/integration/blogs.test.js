@@ -132,7 +132,7 @@ describe('When using route /api/blogs', () => {
         .expect(401)
     })
 
-    test('it deletes blog and associated tables with authenticated and authorized user', async () => {
+    test('it deletes blog and associated tables if authenticated and authorized', async () => {
       const options = { where: { id: blogIds[0] } }
       let taglists = await Taglist.findAll(options)
       expect(taglists.length).toBeTruthy()

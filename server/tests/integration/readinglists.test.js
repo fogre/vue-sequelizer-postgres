@@ -83,7 +83,7 @@ describe('When using route /api/readinglists', () => {
         .expect(400)
     })
 
-    test('it returns 400 for route id', async () => {
+    test('it returns 400 for invalid route id', async () => {
       await api
         .put(`${route}/1380`)
         .set('Cookie', testUserCookie)
