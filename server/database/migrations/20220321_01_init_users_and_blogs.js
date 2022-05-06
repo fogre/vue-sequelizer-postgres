@@ -41,11 +41,6 @@ module.exports = {
         type: DataTypes.TEXT,
         allowNull: false,
         unique: true
-      },
-      likes: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-        allowNull: false
       }
     })
 

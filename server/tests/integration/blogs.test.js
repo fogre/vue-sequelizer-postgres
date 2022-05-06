@@ -2,7 +2,7 @@ const supertest = require('supertest')
 const app = require('../../app')
 const api = supertest(app)
 
-const { User, Blog, Taglist } = require('../../database/models')
+const { User, Blog, Taglist, Like } = require('../../database/models')
 const { logInAndGetSessionCookies } = require('../testHelpers')
 
 const route = '/api/blogs'
@@ -34,9 +34,9 @@ describe('When using route /api/blogs', () => {
     })
 
     test('it returns correct blogs with search req query', async () => {
-      let res = await api.get(`${route}?author=Ada`)
+      let res = await api.get(`${route}?search=Ada+Lovelace`)
       expect(res.status).toBe(200)
-      expect(res.body[0].author).toMatch('Ada')
+      expect(res.body.find(b => b.author === 'Ada Lovelace')).toBeTruthy()
       expect(res.body.find(b => b.author.includes('Fre Derik'))).toBeFalsy()
 
       res = await api.get(`${route}?search=LoVe+And+laces`)
@@ -55,7 +55,7 @@ describe('When using route /api/blogs', () => {
     })
   })
 
-  describe('When sending POST request', () => {
+  describe('When sending POST to /blogs', () => {
     test('it creates a blog with valid body and authenticated user', async () => {
       const res = await api
         .post(route)
@@ -72,12 +72,11 @@ describe('When using route /api/blogs', () => {
       expect(blog.url).toBe('www.url.com')
       expect(blog.userId).toBe(user.id)
       expect(blog.author).toBeFalsy()
-      expect(blog.likes).toBe(0)
       expect(res.body.tags.length).toBe(2)
       blogIds.push(blog.id)
     })
 
-    test('it throws error if the title or url is not unique', async () => {
+    test('it throws error if the blog title or url is not unique', async () => {
       let res = await api
         .post(route)
         .set('Cookie', testUserCookie)
@@ -93,7 +92,7 @@ describe('When using route /api/blogs', () => {
       expect(res.body.error).toMatch('already exists')
     })
 
-    test('it throws 400 if req body is not valid or tags are not in db', async () => {
+    test('it throws 400 if blog req body is not valid or tags are not in db', async () => {
       await api
         .post(route)
         .set('Cookie', testUserCookie)
@@ -108,15 +107,52 @@ describe('When using route /api/blogs', () => {
     })
   })
 
-  describe('When sending PUT request', () => {
+  describe('When sending POST to /blogs/:id/likes', () => {
     test('it increases likes accordingly', async () => {
-      const beforePut = blogs.find(b => b.id === 1)
+      const resBefore = await api.get(`${route}/1`)
+      const blogBeforePost = resBefore.body
+      expect(blogBeforePost['liked_by'].find(b => b.id === user.id))
+        .toBeFalsy()
 
       const res = await api
-        .put(`${route}/1/likes`)
+        .post(`${route}/1/likes`)
         .set('Cookie', testUserCookie)
-        .send({ likes: 3 })
-      expect(res.body.likes).toBe(beforePut.likes + 3)
+      expect(res.status).toBe(200)
+
+      const resAfter = await api.get(`${route}/1`)
+      const blogAfterPost = resAfter.body
+      expect(blogAfterPost['liked_by'].find(b => b.id === user.id))
+        .toBeTruthy()
+      expect(blogAfterPost.likecount).toBe(blogBeforePost.likecount+1)
+    })
+
+    test('it decreases likes accordingly', async () => {
+      const resBefore = await api.get(`${route}/1`)
+      const blogBeforePost = resBefore.body
+      expect(blogBeforePost['liked_by'].find(b => b.id === user.id))
+        .toBeTruthy()
+
+      const res = await api
+        .post(`${route}/1/likes`)
+        .set('Cookie', testUserCookie)
+      expect(res.status).toBe(204)
+
+      const resAfter = await api.get(`${route}/1`)
+      const blogAfterPost = resAfter.body
+      expect(blogAfterPost['liked_by'].find(b => b.id === user.id))
+        .toBeFalsy()
+      expect(blogAfterPost.likecount).toBe(blogBeforePost.likecount-1)
+    })
+
+    test('it thows correct error codes if unauthenticated or blog not found', async () => {
+      await api
+        .post(`${route}/1/likes`)
+        .expect(401)
+
+      await api
+        .post(`${route}/12345/likes`)
+        .set('Cookie', testUserCookie)
+        .expect(400)
     })
   })
 
@@ -133,7 +169,9 @@ describe('When using route /api/blogs', () => {
     })
 
     test('it deletes blog and associated tables if authenticated and authorized', async () => {
-      const options = { where: { id: blogIds[0] } }
+      const options = { where: { blogId: blogIds[0] } }
+      const blogsBeforeDelete = await Blog.findAll()
+
       let taglists = await Taglist.findAll(options)
       expect(taglists.length).toBeTruthy()
 
@@ -144,6 +182,11 @@ describe('When using route /api/blogs', () => {
 
       taglists = await Taglist.findAll(options)
       expect(taglists.length).toBeFalsy()
+      const likes = await Like.findAll(options)
+      expect(likes.length).toBeFalsy()
+
+      const blogsAfterDelete = await Blog.findAll()
+      expect(blogsAfterDelete.length).toBe(blogsBeforeDelete.length -1)
     })
   })
 })

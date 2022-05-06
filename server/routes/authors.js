@@ -1,18 +1,21 @@
 const router = require('express').Router()
 const { sequelize } = require('../database/sequelize')
-const { Blog } = require('../database/models')
+const { Blog, Like } = require('../database/models')
 
 router.get('/', async (req,res) => {
   const blogs = await Blog.findAll({
-    group: 'author',
     attributes: [
       'author',
       [sequelize.fn('COUNT', sequelize.col('author')), 'blogs'],
-      [sequelize.fn('SUM', sequelize.col('likes')), 'likes']
+      [sequelize.literal(`
+        (SELECT COUNT(*) FROM likes WHERE likes.blog_id = blog.id)
+      `), 'likecount']
     ],
-    order: [
-      [sequelize.fn('MAX', sequelize.col('likes')), 'DESC']
-    ]
+    include: [
+      { model: Like, attributes: [] }
+    ],
+    group: ['author', 'blog.id'],
+    order: [ [sequelize.literal('likecount DESC')] ]
   })
   res.json(blogs)
 })

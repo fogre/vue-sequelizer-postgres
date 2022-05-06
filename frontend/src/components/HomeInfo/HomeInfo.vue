@@ -1,7 +1,7 @@
 <template>
   <div class="info-wrapper">
     <div class="info-content">
-      <h3 class="header">Blog <span>-</span> Collect <span>-</span> Like</h3>
+      <h3 class="header">Blog<span> ~ </span>Collect<span> ~ </span> Like</h3>
       <p>Bloglist is the ultimate social blog listing site!</p>
       <p>Ýou can add blogs, list them and like em to your hearts content.</p>
       <br />
@@ -28,11 +28,11 @@
 
     & h3 {
       color: var(--color-secondary);
-      font-size: calc(1.5rem + 1vw);
+      font-size: calc(1.7rem + 1vw);
       padding-bottom: var(--padding-main);
 
       & span {
-        font-size: calc(1.5rem + 1vw);
+        font-size: calc(1rem + 1vw);
         color: black;
       }
     }

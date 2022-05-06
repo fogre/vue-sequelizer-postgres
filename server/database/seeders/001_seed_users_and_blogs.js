@@ -35,28 +35,24 @@ const blogs = [
   {
     title: 'Miksi minusta tuli niin komea',
     author: 'Fre Derik',
-    likes: 12,
     url: 'https://fullstackopen.com/1',
     ...blogBaseObject
   },
   {
     title: 'Love and Laces in literature',
     author: 'Ada Lovelace',
-    likes: 4,
     url: 'https://fullstackopen.com/2',
     ...blogBaseObject
   },
   {
     title: 'Why dont people believe I am a human?',
     author: 'NotATuring Machine',
-    likes: 7,
     url: 'https://fullstackopen.com/3',
     ...blogBaseObject
   },
   {
     title: 'Why not hee hee your whole life?',
     author: 'Michael Jackson',
-    likes: 0,
     url: 'https://fullstackopen.com/4',
     ...blogBaseObject
   }

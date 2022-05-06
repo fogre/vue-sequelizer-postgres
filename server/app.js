@@ -22,10 +22,10 @@ app.use(redisSessionStorage)
 app.use(errorMiddleware.checkSessionConnection)
 app.use(cors({
   origin: [
-    "http://localhost:3000",
-    "http://localhost:3001",
+    'http://localhost:3000',
+    'http://localhost:3001',
   ],
-  exposedHeaders: ["set-cookie"],
+  exposedHeaders: ['set-cookie'],
   credentials: true
 }))
 app.use(express.json())

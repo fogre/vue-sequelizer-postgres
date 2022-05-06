@@ -10,8 +10,8 @@ describe('When using route /api/authors', () => {
       expect(res.status).toBe(200)
       const authors = res.body
       expect(authors.length).toBeTruthy()
-      expect(authors[0].likes)
-        .toBeGreaterThanOrEqual(authors[authors.length-1].likes)
+      expect(authors[0].likecount)
+        .toBeGreaterThanOrEqual(authors[authors.length-1].likecount)
     })
   })
 })

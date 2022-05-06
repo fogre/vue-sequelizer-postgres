@@ -15,6 +15,22 @@ const router = createRouter({
       component: () => import('./ProfilePage.vue')
     },
     {
+      path: '/blogs',
+      component: () => import('./BlogsPage.vue')
+    },
+    {
+      path: '/blogs/add',
+      component: () => import('./AddBlog.vue')
+    },
+    {
+      path: '/blogs/:id',
+      component: () => import('./SingleBlogPage.vue')
+    },
+    {
+      path: '/users',
+      component: () => import('./UsersPage.vue')
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
       component: () => import("./404.vue")

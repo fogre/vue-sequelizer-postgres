@@ -1,7 +1,12 @@
 const { Model, DataTypes } = require('sequelize')
 const { sequelize } = require('../sequelize')
 
-class Blog extends Model {}
+class Blog extends Model {
+  async numberOfLikes() {
+    return (await this.getLikes()).length
+  }
+}
+
 Blog.init({
   id: {
     type: DataTypes.INTEGER,
@@ -42,14 +47,6 @@ Blog.init({
       notEmpty: true
     }
   },
-  likes: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    defaultValue: 0,
-    validate: {
-      min: 0
-    }
-  }
 }, {
   sequelize,
   underscored: true,

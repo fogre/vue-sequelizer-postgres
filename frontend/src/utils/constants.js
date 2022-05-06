@@ -1,6 +1,6 @@
 const THEME_SHARED_VALUES = {
   primary: 'blue',
-  secondary: 'hsl(23deg 67% 63%)',
+  secondary: 'hsl(15deg 67% 63%)',
   danger: 'red'
 }
 

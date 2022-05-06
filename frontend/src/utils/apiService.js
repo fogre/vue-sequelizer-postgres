@@ -17,3 +17,11 @@ export const apiDelete = async resource => {
 }
 
 export const apiGetUser = async id => await apiGet(`/users/${id}`)
+
+export const apiGetWithSearch = async (resource, searchParams) => {
+  if (searchParams) {
+    const parsedParams = searchParams.search.replace(/\s/g, '+')
+    return await apiGet(`${resource}?search=${parsedParams}`)
+  }
+  return await apiGet(resource)
+}

@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt')
 const router = require('express').Router()
 
-const { User } = require('../database/models')
+const { User, Blog } = require('../database/models')
 const { isReqBodyValid } = require('../utils/validators')
 const { confirmSession } = require('../middleware/authenticationMiddleware')
 
@@ -11,7 +11,19 @@ router.post('/', async (req, res) => {
 
   const user = await User
     .scope('withLogin')
-    .findOne({ where: { username: username } })
+    .findOne({
+      include: [
+        {
+          model: Blog,
+          as: 'liked_blogs',
+          attributes: ['id'],
+          through: {
+            attributes: []
+          }
+        }
+      ],
+      where: { username: username }
+    })
 
   const passwordCorrect = user === null
     ? false
@@ -38,7 +50,8 @@ router.post('/', async (req, res) => {
   res.status(200).json({
     id: user.id,
     username: user.username,
-    name: user.name
+    name: user.name,
+    liked_blogs: user.liked_blogs
   })
 })
 

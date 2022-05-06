@@ -29,9 +29,8 @@ describe('When using routes that require admin permissions', () => {
         .expect(401)
 
       await api
-        .put('/api/blogs/2/likes')
+        .post('/api/blogs/1/likes')
         .set('Cookie', userToDisableCookie)
-        .send({ likes: 1 })
         .expect(200)
     })
 
@@ -44,9 +43,8 @@ describe('When using routes that require admin permissions', () => {
       expect(res.body.disabled).toBeTruthy()
 
       await api
-        .put('/api/blogs/3/likes')
+        .post('/api/blogs/3/likes')
         .set('Cookie', userToDisableCookie)
-        .send({ likes: 1 })
         .expect(401)
     })
   })

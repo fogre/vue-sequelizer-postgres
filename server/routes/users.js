@@ -1,3 +1,4 @@
+const { Op } = require('sequelize')
 const bcrypt = require('bcrypt')
 const router = require('express').Router()
 
@@ -13,21 +14,33 @@ const {
 } = require('../utils/validators')
 
 router.get('/', async (req, res) => {
+  const where = {}
+  if (req.query.search) {
+    where[Op.or] = [
+      {
+        username: {
+          [Op.iLike]: `%${req.query.search}%`
+        }
+      }
+    ]
+  }
   const users = await User.findAll({
     attributes: {
       include: [
-        [sequelize.fn('COUNT', sequelize.col('blogs.id')), 'blogCount'],
-        [sequelize.fn('SUM', sequelize.col('blogs.likes')), 'blogLikes'],
-        [sequelize.fn('AVG', sequelize.col('blogs.likes')), 'averageLikes']
+        //count of user's blogs
+        [sequelize.literal(`(
+          SELECT COUNT(*) FROM "blogs" AS "blog" WHERE "blog".user_id = "user".id
+        )`), 'blogcount'],
+        //count of user's blog likes
+        [sequelize.literal(`(
+          SELECT COUNT(*) FROM "likes" AS "like" WHERE ("like".blog_id) IN
+          (SELECT id FROM "blogs" AS "blog" WHERE "blog".user_id = "user".id)
+        )`), 'likecount']
       ]
     },
-    include: [{
-      model: Blog, attributes: [],
-    }],
     group: ['user.id'],
-    order: [
-      [sequelize.fn('MAX', sequelize.col('likes')), 'DESC NULLS LAST']
-    ]
+    order: [ [sequelize.literal('likecount DESC')] ],
+    where
   })
   res.json(users)
 })

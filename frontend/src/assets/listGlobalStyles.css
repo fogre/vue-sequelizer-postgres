@@ -1,0 +1,48 @@
+/*
+  Shared styles between the list components. All start with "list-"
+*/
+.list-grid-field {
+  display: grid;
+  height: max-content;
+  text-align: center;
+  max-width: 100%;
+}
+
+.list-ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list-li {
+  padding: 6px 0;
+  overflow-wrap: break-word;
+
+  &:nth-child(2n) {
+    background-color: var(--background-transparent-secondary);
+    border-top: var(--border-small);
+    border-bottom: var(--border-small);
+    border-color: var(--background-transparent-primary);
+  }
+}
+
+.list-item {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-color-main);
+  padding: 6px 6px;
+  word-break: break-word;
+
+  &:not(:first-child) {
+    border-left: var(--border-small);
+    border-left-style: dotted;
+  }
+}
+
+.list-link {
+  color: inherit;
+
+  &:hover {
+    color: var(--color-primary);
+  }
+}

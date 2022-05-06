@@ -11,15 +11,15 @@
   	['users', user.value.id], () => apiGetUser(user.value.id)
   )
 
-  const handleSignout = async () => {
+  const handleSignout = () => {
   	try {
-  		await apiDelete('/login')
+  		apiDelete('/login')
   		clearStorage()
-  		await router.push('/')
   		setUser(null)
+  		router.push('/')
   	} catch (e) {
   		console.log(e)
-  	}		
+  	}
   }
 </script>
 

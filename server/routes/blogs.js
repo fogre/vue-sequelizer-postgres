@@ -1,7 +1,8 @@
 const { Op } = require('sequelize')
 const router = require('express').Router()
-const { User, Blog, Tag, Readinglist, Taglist } = require('../database/models')
 
+const { sequelize } = require('../database/sequelize')
+const { User, Blog, Tag, Like, Readinglist, Taglist } = require('../database/models')
 const { confirmSession } = require('../middleware/authenticationMiddleware')
 const { isAuthorizedUser, isReqBodyValid, isResourceInDB } = require('../utils/validators')
 
@@ -14,42 +15,77 @@ const blogFinder = async (req, res, next) => {
 router.get('/', async (req, res) => {
   const where = {}
 
-  if (req.query.search || req.query.author) {
+  if (req.query.search) {
+    const searchOp = { [Op.iLike]: `%${req.query.search}%` }
     where[Op.or] = [
-      {
-        author: {
-          [Op.iLike]: `%${req.query.author}%`
-        }
-      },
-      {
-        title: {
-          [Op.iLike]: `%${req.query.search}%`
-        }
-      },
-      {
-        url: {
-          [Op.iLike]: `%${req.query.search}%`
-        }
-      }
+      { author: searchOp },
+      { title: searchOp },
+      { url: searchOp }
     ]
   }
 
   const blogs = await Blog.findAll({
-    attributes: { attributes: { exclude: ['userId'] } },
-    include: {
-      model: User,
-      attributes: ['username']
+    attributes: {
+      exclude: ['userId'],
+      include: [
+        [sequelize.literal(`
+          (SELECT COUNT(*) FROM likes WHERE likes.blog_id = blog.id)
+        `), 'likecount']
+      ]
     },
+    include: [
+      {
+        model: User,
+        attributes: ['username', 'id']
+      },
+      {
+        model: Like,
+        attributes: [],
+      }
+    ],
+    group: ['blog.id', 'user.id', 'user.username', 'likes.id'],
     order: [
-      ['likes', 'DESC']
+      [sequelize.literal('likecount DESC')]
     ],
     where
   })
   res.json(blogs)
 })
 
-router.get('/:id', blogFinder, async (req, res) => {
-  res.json(req.blog)
+router.get('/:id', async (req, res) => {
+  const blog = await Blog.findByPk(req.params.id, {
+    attributes: {
+      exclude: ['userId'],
+      include: [
+        [sequelize.literal(`
+          (SELECT COUNT(*) FROM likes WHERE likes.blog_id = blog.id)
+        `), 'likecount']
+      ]
+    },
+    include: [
+      {
+        model: User,
+        attributes: ['username', 'id']
+      },
+      {
+        model: User,
+        as: 'liked_by',
+        attributes: ['id', 'username'],
+        through: {
+          attributes: []
+        },
+      },
+      {
+        model: Tag,
+        as: 'tags',
+        through: {
+          attributes: []
+        },
+      }
+    ]
+  })
+  isResourceInDB(blog, req)
+  res.json(blog)
 })
 
 router.post('/', confirmSession, async (req, res) => {
@@ -57,10 +93,8 @@ router.post('/', confirmSession, async (req, res) => {
   const { author, title, url, tags } = req.body
   let tagsInDB
 
+  //parse url so all the urls are more uniform
   let parsedUrl = url.replace(/^https?:\/\//, '')
-  if (!parsedUrl.startsWith('www.')) {
-    parsedUrl = `www.${parsedUrl}`
-  }
 
   const blog = await Blog.create({
     title,
@@ -69,6 +103,7 @@ router.post('/', confirmSession, async (req, res) => {
     userId: req.session.userId
   })
 
+  //if blog comes with tags, create Taglist join tables
   if (tags) {
     if (!Array.isArray(tags)) {
       return res.status(400).json({ error: 'tags should be an array' })
@@ -85,11 +120,19 @@ router.post('/', confirmSession, async (req, res) => {
   res.json({ blog, tags: tagsInDB })
 })
 
-router.put('/:id/likes', confirmSession, blogFinder, async(req, res) => {
-  isReqBodyValid('likes', req.body)
-  req.blog.likes = req.blog.likes + req.body.likes
-  const updatedBlog = await req.blog.save()
-  res.json(updatedBlog)
+router.post('/:id/likes', confirmSession, blogFinder, async (req, res) => {
+  const likeUserAndBlog = {
+    userId: req.session.userId,
+    blogId: req.blog.id
+  }
+
+  const alreadyLiked = await Like.findOne({ where: likeUserAndBlog })
+  if (alreadyLiked) {
+    await alreadyLiked.destroy()
+    return res.status(204).end()
+  }
+  const newLike = Like.create(likeUserAndBlog)
+  res.json(newLike)
 })
 
 router.delete('/:id', confirmSession, blogFinder, async (req, res) => {
@@ -97,6 +140,7 @@ router.delete('/:id', confirmSession, blogFinder, async (req, res) => {
   const findOptions = { where: { blogId: req.blog.id } }
   await Readinglist.destroy(findOptions)
   await Taglist.destroy(findOptions)
+  await Like.destroy(findOptions)
   await req.blog.destroy()
   res.status(204).end()
 })

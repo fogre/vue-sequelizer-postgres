@@ -12,10 +12,10 @@
         <RouterLink to="/" class="nav-link">
           home
         </RouterLink>
-        <RouterLink to="/" class="nav-link">
+        <RouterLink to="/blogs" class="nav-link">
           blogs
         </RouterLink>
-        <RouterLink to="/" class="nav-link">
+        <RouterLink to="/users" class="nav-link">
           users
         </RouterLink>  
       </div>
