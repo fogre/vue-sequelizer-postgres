@@ -11,7 +11,7 @@ defaults:
 
 
 jobs:
-  runner-job:
+  backend-test:
     runs-on: ubuntu-latest
 
     services:
@@ -52,10 +52,15 @@ jobs:
       - name: Create test .env file
         run: |
           touch .env
-          echo ENV=test >> .env
-          echo TEST_DATABASE_URL=postgres://root:postgres@localhost:5432/blogapitest >> .env
+          echo TEST_DATABASE_URL='postgres://root:postgres@localhost:5432/blogapitest' >> .env
           echo REDIS_URL=redis://localhost:6379/ >> .env
           echo SECRET=sekret12346 >> .env
 
+      - name: Check .env file and location
+        run: |
+          cat .env
+          echo "$PWD"
+
       - name: Run tests
         run: npm run test
+
