@@ -3,7 +3,9 @@ const { Umzug, SequelizeStorage } = require('umzug')
 
 const { DATABASE_URL, ENV } = require('../utils/config')
 
+console.log(DATABASE_URL)
 const logQueries = ENV === 'development' ? true : false
+
 
 const sequelize = new Sequelize(DATABASE_URL, {
   logging: logQueries
