@@ -1,5 +1,5 @@
 # BUILD STAGE
-FROM node:14.17-buster-slim AS build-stage
+FROM node:14.17-buster-slim
 
 WORKDIR /usr/src/app
 
@@ -19,7 +19,7 @@ FROM node:14.17-buster-slim
 
 EXPOSE 3000
 
-COPY --from=build-stage /usr/src/app/dist /usr/share/serve
+COPY --from=0 /usr/src/app/dist /usr/share/serve
 
 RUN npm install -g serve
 
