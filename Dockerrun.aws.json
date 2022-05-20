@@ -1,0 +1,33 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+      "name": "nginx",
+      "image": "fogre/bloglist-nginx",
+      "hostname": "nginx",
+      "essential": true,
+      "portMappings": [
+        {
+          "hostPort": 8080,
+          "containerPort": 80
+        }
+      ],
+      "links": ["app", "api"],
+      "memory": 100
+    },
+    {
+      "name": "app",
+      "image": "fogre/bloglist-app",
+      "hostname": "app",
+      "essential": false,
+      "memory": 300
+    },
+    {
+      "name": "api",
+      "image": "fogre/bloglist-api",
+      "hostname": "api",
+      "essential": false,
+      "memory": 300
+    }
+  ]
+}

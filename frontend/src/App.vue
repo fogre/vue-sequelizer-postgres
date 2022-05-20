@@ -1,15 +1,38 @@
 <script setup>
-  import { provide, ref } from "vue"
-  import { getStorage } from './utils/localStorage'
+  import { provide, ref, watch } from "vue"
+  import { getStorage, setStorage } from './utils/localStorage'
   import { THEMES } from './utils/constants'
   import MainHeader from "./components/Header/MainHeader.vue"
 
   const user = ref(getStorage())
   const theme = ref('light')
 
-  console.log(user.value)
+  watch(() => user.value, newVal => {
+    if (newVal) {
+      setStorage(newVal)
+    }
+  })
+
   const setUser = userInfo => {
     user.value = userInfo
+  }
+
+  //instead of refetching user, keep track of likes locally
+  const addLike = like => {
+    const newLikes = [...user.value.liked_blogs]
+    newLikes.push({ id: like.blogId })
+    user.value = {
+      ...user.value,
+      liked_blogs: newLikes
+    }
+  }
+
+  const removeLike = blogId => {
+    const newLikes = [...user.value.liked_blogs].filter(l => l.id !== blogId)
+    user.value = {
+      ...user.value,
+      liked_blogs: newLikes
+    }
   }
 
   const changeTheme = () => {
@@ -19,7 +42,9 @@
 
   provide('user', {
     user,
-    setUser
+    setUser,
+    addLike,
+    removeLike
   })
 
   provide('theme', {
@@ -65,7 +90,6 @@
     --color-secondary: v-bind(THEMES[theme].secondary);
     --color-danger: v-bind(THEMES[theme].danger);
     --text-color-main: v-bind(THEMES[theme].textColorMain);
-
   }
 
   .app-view-wrapper {

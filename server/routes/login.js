@@ -16,7 +16,7 @@ router.post('/', async (req, res) => {
         {
           model: Blog,
           as: 'liked_blogs',
-          attributes: ['id'],
+          attributes: ['id', 'title'],
           through: {
             attributes: []
           }

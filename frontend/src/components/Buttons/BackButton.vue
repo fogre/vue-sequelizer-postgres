@@ -12,6 +12,5 @@
 		:iconColor="'white'"
 		:textAfter="'back'"
 		@handleClick="router.back"
-		:style="{ marginBottom: '-30px' }"
 	/>
 </template>

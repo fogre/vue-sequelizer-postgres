@@ -1,0 +1,114 @@
+name: CICD
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  backend-test:
+    name: run backend tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./server
+
+    services:
+      redis:
+        image: redis
+        # Set health checks
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: blogapitest
+        # Set health checks
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run lint
+        run: npm run lint:fix
+
+      - name: Create test .env file
+        run: |
+          touch .env
+          echo TEST_DATABASE_URL="postgres://root:postgres@localhost:5432/blogapitest" >> .env
+          echo REDIS_URL="redis://localhost:6379/" >> .env
+          echo SECRET=sekret12346 >> .env
+          cat .env
+          echo "$PWD"
+
+      - name: Run tests
+        run: npm run test
+
+  deploy:
+    name: deploy to Dockerhub and AWS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Docker Login
+        uses: docker/login-action@v1.8.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          logout: true
+
+      #Build API dockerfile
+      - name: Build API image
+        run: docker build -t fogre/bloglist-api -f ./server/Dockerfile ./server
+      - name: Tag our Image
+        run: docker tag fogre/bloglist-api fogre/bloglist-api:latest
+      - name: Push to dockerhub
+        run: docker push fogre/bloglist-api
+
+      #Build APP dockerfile
+      - name: Build APP image
+        run: docker build -t fogre/bloglist-app -f ./frontend/Dockerfile ./frontend
+      - name: Tag our Image
+        run: docker tag fogre/bloglist-app fogre/bloglist-app:latest
+      - name: Push to dockerhub
+        run: docker push fogre/bloglist-app
+
+      #Build NGINX dockerfile
+      - name: Build NGINX image
+        run: docker build -t fogre/bloglist-nginx -f ./nginx/Dockerfile ./nginx
+      - name: Tag our Image
+        run: docker tag fogre/bloglist-nginx fogre/bloglist-nginx:latest
+      - name: Push to dockerhub
+        run: docker push fogre/bloglist-nginx
+
+      #Deploy to AWS
+      - name: Deploy to AWS EB
+        uses: einaregilsson/beanstalk-deploy@v20
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+          aws_secret_key: ${{ secrets.AWS_ACCESS_SECRET_KEY }}
+          application_name: Bloglist-env
+          environment_name: Bloglist-env
+          version_label: "app-cbe0-210131_121135"
+          region: eu-north-1
+
+
+

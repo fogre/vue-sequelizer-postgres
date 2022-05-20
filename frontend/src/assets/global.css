@@ -7,7 +7,7 @@ html {
   --border-large: 4px solid hsl(23deg 67% 68%);
   --border-small: 2px solid hsl(23deg 67% 68%);
 
-  --font-small: calc(10px / 1rem);
+  --font-small: calc(14px);
   --font-normal: calc(16px / 1rem);
 
   --radius-large: 16px;

@@ -3,11 +3,12 @@
 	import { useQuery } from 'vue-query'
 	import { apiGet } from '../utils/apiService'
 
-	import BackButton from '../components/Buttons/BackButton.vue'
+	import BlogLikers from '../components/Other/BlogLikers.vue'
 	import Icon from '../components/Icons/Icon.vue'
 	import Link from '../components/Links/Link.vue'
+	import TagLink from '../components/Links/TagLink.vue'
 	import LikeButton from '../components/Buttons/LikeButton.vue'
-	import ViewCard from '../components/Cards/ViewCard.vue'
+	import DetailsCard from '../components/Cards/DetailsCard.vue'
 
 	const router = useRouter()
 
@@ -21,53 +22,46 @@
 	<div class="g-flex-centered">
 		<div class="g-max-width-wrapper">
 			<h1>Blogs</h1>
-			<BackButton />
-			<ViewCard>
+			<DetailsCard>
 				<p v-if="isLoading" class="g-flex-centered">Loading...</p>
 				<p v-else-if="isError">Oops, error happened!</p>
 				<div v-else class="content">
 					<h2>{{ data.data.title }}</h2>
-					<div class="field">
-						<LikeButton
-							:likes="data.data.likecount"
-							:blogId="data.data.id"
+					<BlogLikers
+						:blogId="data.data.id"
+						:likedBy="data.data.liked_by"
+					/>
+					<div class="fields-wrapper">
+						<div class="field">
+							<p>Author:</p>
+							<Link
+								v-if="data.data.author"
+								:linkType="'route'"
+								:linkStyle="'text'"
+								:url="`/authors/${data.data.author}`"
+							>
+								{{ data.data.author }}
+							</Link>
+							<p v-else>?</p>
+						</div>
+						<div class="field">
+							<p>Added by:</p>
+							<Link
+								:linkType="'route'"
+								:linkStyle="'text'"
+								:url="`/users/${data.data.user.id}`"
+							>
+								{{ data.data.user.username }}
+							</Link>
+						</div>
+					</div>
+					<div class="tags-wrapper">
+						<TagLink
+							v-for="tag in data.data.tags"
+							:id="tag.id"
+							:tagName="tag.name"
 						/>
 					</div>
-					<div class="field">
-						<p>Link:</p>
-						<Link
-							:linkType="'external'"
-							:linkStyle="'text'"
-							:url="data.data.url"
-						>
-							{{ data.data.url }}
-						</Link>
-					</div>
-					<div class="field">
-						<p>Author:</p>
-						<Link
-							v-if="data.data.author"
-							:linkType="'route'"
-							:linkStyle="'text'"
-							:url="`/authors/${data.data.author}`"
-						>
-							{{ data.data.author }}
-						</Link>
-						<p v-else>?</p>
-					</div>
-					<div class="field">
-						<p>Added by:</p>
-						<Link
-							:linkType="'route'"
-							:linkStyle="'text'"
-							:url="`/users/${data.data.user.id}`"
-						>
-							{{ data.data.user.username }}
-						</Link>
-					</div>
-					<p v-for="tag in data.data.tags">
-						{{ tag.name }}
-					</p>
 					<Link
 						:linkType="'external'"
 						:linkStyle="'padded'"
@@ -79,8 +73,12 @@
 							:size="20"
 						/>
 					</Link>
+					<LikeButton
+						:blogId="data.data.id"
+						class="like-button"
+					/>
 				</div>
-			</ViewCard>
+			</DetailsCard>
 		</div>
 	</div>
 </template>
@@ -97,5 +95,25 @@
 		gap: 6px;
 		font-weight: 700;
 		margin-bottom: 5px;
+
+		& p {
+			font-weight: 400;
+		}
+	}
+
+	.fields-wrapper {
+		margin: 24px 0;
+	}
+
+	.tags-wrapper {
+		display: flex;
+		gap: 16px;
+		margin-bottom: 32px;
+	}
+
+	.like-button {
+		position: absolute;
+		right: 10px;
+		top: 5px;
 	}
 </style>

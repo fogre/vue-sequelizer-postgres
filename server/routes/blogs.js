@@ -131,7 +131,7 @@ router.post('/:id/likes', confirmSession, blogFinder, async (req, res) => {
     await alreadyLiked.destroy()
     return res.status(204).end()
   }
-  const newLike = Like.create(likeUserAndBlog)
+  const newLike = await Like.create(likeUserAndBlog)
   res.json(newLike)
 })
 

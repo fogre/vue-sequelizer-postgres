@@ -5,7 +5,6 @@
 		ExternalLinkIcon,
 		PlusIcon,
 		ThumbUpIcon,
-		ThumbDownIcon,
 		XIcon
 	} from '@heroicons/vue/solid'
 
@@ -21,7 +20,6 @@
 			case 'arrow-left': return ArrowNarrowLeftIcon
 			case 'external-link': return ExternalLinkIcon
 			case 'like-up': return ThumbUpIcon
-			case 'like-down': return ThumbDownIcon
 			case 'plus': return PlusIcon
 			case 'close': return XIcon
 			default: throw new Error(`Icon ${props.icon} not imported`)

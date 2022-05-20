@@ -1,40 +1,53 @@
 <script setup>
-	import { inject, computed } from 'vue'
-	import { useMutation } from 'vue-query'
+	import { inject } from 'vue'
+	import { useMutation, useQueryClient } from 'vue-query'
+	import { apiPost } from '../../utils/apiService'
 	import Icon from '../Icons/Icon.vue'
 
 	const props = defineProps({
-		likes: { type: Number, required: true },
 		blogId: { type: Number, required: true }
 	})
 
-	const { user } = inject('user')
+	const queryClient = useQueryClient()
+	const { user, addLike, removeLike } = inject('user')
 
-	const handleClick = () => {
-		console.log('asd')
-	}
-
-	const likeIcon = computed(() => {
-		const u = user.value.liked_blogs.find(b => b.id === props.blogId)
-		console.log(u)
-		if (u) {
-			return 'like-down'
+	const { mutate } = useMutation(() => apiPost(`/blogs/${props.blogId}/likes`), {
+		onError: error => {
+			console.log(error)
+		},
+		onSuccess: async data => {
+			//if data status is 200, a like is added
+			if (data && data.status === 200 && data.data) {
+				console.log('adding like')
+				addLike(data.data)
+			//if data.status is 204 a like is deleted
+			} else if (data && data.status === 204) {
+				console.log('removng like')
+				removeLike(props.blogId)
+			}
+			await queryClient.invalidateQueries('/blogs', props.blogId)
 		}
-		return 'like-up'
 	})
 </script>
 
-
 <template>
 	<button
-		@click="handleClick"
-		class="g-unstyled-button g-flex-centered"
+		@click="() => mutate()"
+		class="g-unstyled-button g-flex-centered like"
 		:disabled="!user"
 	>
-		<p>{{ props.likes }}</p>
 		<Icon
-			:icon="likeIcon"
-			:size="20"
+			:icon="'like-up'"
+			:size="25"
 		/>
 	</button>
 </template>
+
+<style scoped>
+	.like {
+		color: var(--color-primary);
+		padding: 5px;
+		height: min-content;
+	}
+
+</style>
