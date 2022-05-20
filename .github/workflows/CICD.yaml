@@ -110,7 +110,7 @@ jobs:
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
           aws_secret_key: ${{ secrets.AWS_ACCESS_SECRET_KEY }}
-          application_name: Bloglist-env
+          application_name: Bloglist
           environment_name: Bloglist-env
           version_label: "bloglist-${{ github.sha }}"
           region: eu-north-1
