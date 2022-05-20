@@ -62,6 +62,7 @@ jobs:
 
   deploy:
     name: deploy to Dockerhub and AWS
+    needs: backend-test
     runs-on: ubuntu-latest
 
     steps:
@@ -99,6 +100,10 @@ jobs:
       - name: Push to dockerhub
         run: docker push fogre/bloglist-nginx
 
+      #Create deploy.zip
+      - name: Generate deployment package
+      run: zip -r deploy.zip . -x '*.git*'
+
       #Deploy to AWS
       - name: Deploy to AWS EB
         uses: einaregilsson/beanstalk-deploy@v20
@@ -107,8 +112,9 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_ACCESS_SECRET_KEY }}
           application_name: Bloglist-env
           environment_name: Bloglist-env
-          version_label: "app-cbe0-210131_121135"
+          version_label: "bloglist-${{ github.sha }}"
           region: eu-north-1
+          deployment_package: deploy.zip
 
 
 
