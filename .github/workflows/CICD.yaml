@@ -102,7 +102,7 @@ jobs:
 
       #Create deploy.zip
       - name: Generate deployment package
-      run: zip -r deploy.zip . -x '*.git*'
+        run: zip -r deploy.zip . -x '*.git*'
 
       #Deploy to AWS
       - name: Deploy to AWS EB
@@ -115,6 +115,3 @@ jobs:
           version_label: "bloglist-${{ github.sha }}"
           region: eu-north-1
           deployment_package: deploy.zip
-
-
-
