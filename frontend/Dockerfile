@@ -3,13 +3,13 @@ FROM node:14.17-buster-slim AS build-stage
 
 WORKDIR /usr/src/app
 
-ENV NODE_ENV production
-
 COPY package*.json /usr/src/app/
 
 RUN npm ci
 
 COPY . /usr/src/app/
+
+RUN ls -l
 
 RUN npm run build
 
