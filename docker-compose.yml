@@ -18,7 +18,7 @@ services:
     image: fogre/bloglist-api
     restart: on-failure
     environment:
-      - DATABASE_URL=postgres://postgres:FazerMusiikki123@aa1cxti9p618zkb.cay7nruc9drt.eu-north-1.rds.amazonaws.com:5432/
+      - DATABASE_URL=wellthiswasjustfortestingsoItdidntmatteranyways
       - REDIS_URL=redis://redis_blogapi:6379/
     depends_on:
       redis:
