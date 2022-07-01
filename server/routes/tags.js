@@ -1,7 +1,7 @@
 const { Op } = require('sequelize')
 const router = require('express').Router()
 
-const { Tag } = require('../database/models')
+const { Tag, Blog } = require('../database/models')
 const { confirmSession } = require('../middleware/authenticationMiddleware')
 const { isReqBodyValid, isResourceInDB } = require('../utils/validators')
 
@@ -19,6 +19,23 @@ router.get('/', async (req, res) => {
   }
   const tags = await Tag.findAll({ where })
   res.json(tags)
+})
+
+router.get('/:id', async (req, res) => {
+  const tag = await Tag.findByPk(req.params.id, {
+    include: [
+      {
+        model: Blog,
+        as: 'blogs',
+        attributes: ['id', 'title'],
+        through: {
+          attributes: []
+        },
+      }
+    ]
+  })
+  isResourceInDB(tag, req)
+  res.json(tag)
 })
 
 router.post('/', confirmSession, async (req, res) => {

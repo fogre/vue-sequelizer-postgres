@@ -13,7 +13,7 @@ let getAsync
 let setAsync
 let expireAsync
 let delAsync
-const expirationTime = 1000 * 60 * 30 //30mins
+const expirationTime = 1000 * 60 * 60 //60mins
 const RedisStore = connectRedis(session)
 const redisClient = redis.createClient({
   url: REDIS_URL,

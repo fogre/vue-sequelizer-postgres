@@ -6,15 +6,12 @@
 </script>
 
 <template>
-  <p v-if="field === 'averagelikes'">
-    {{ props.item.likecount ? (props.item.likecount / props.item.blogcount).toFixed(2) : '?' }}
-  </p>
   <RouterLink
-    v-else-if="field === 'username'"
-    :to="`/users/${item.id}`"
+    v-if="field === 'author'"
+    :to="`/authors/${item.author}`"
     class="list-link"
   >
-    {{ item.username }}
+    {{ item.author }}
   </RouterLink>
   <p v-else>{{ item[field] }}</p>
 </template>

@@ -7,13 +7,17 @@ export const signInSchema = [
     $formkit: 'text',
     label: 'Username',
     name: 'username',
-    validation: 'required'
+    validation: 'required',
+    labelClass: 'form-label-white',
+    inputClass: 'form-input'
   },
   {
     $formkit: 'password',
     label: 'Password',
     type: 'password',
     name: 'password',
-    validation: 'required'
+    validation: 'required',
+    labelClass: 'form-label-white',
+    inputClass: 'form-input'
   }
 ]

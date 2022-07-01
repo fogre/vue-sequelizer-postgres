@@ -25,6 +25,13 @@
   >
     {{ item.title }}
   </RouterLink>
+  <RouterLink
+    v-else-if="field === 'author'"
+    :to="`/authors/${item.author}`"
+    class="list-link"
+  >
+    {{ item.author }}
+  </RouterLink>
   <p v-else-if="field === 'createdAt'">
     {{ (new Date(item.createdAt).toLocaleDateString(undefined, dateOptions)) }}
   </p>

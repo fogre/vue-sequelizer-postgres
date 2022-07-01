@@ -45,13 +45,8 @@ router.get('/', async (req, res) => {
   res.json(users)
 })
 
-router.get('/:id', async (req, res) => {
-  const where = {}
-
-  if (req.query.read || typeof req.query.read === 'boolean') {
-    where.read = req.query.read
-  }
-  const user = await User.findByPk(req.params.id, {
+router.get('/profile', confirmSession, async (req, res) => {
+  const user = await User.findByPk(req.session.userId, {
     attributes: { exclude: [''] },
     include: [
       {
@@ -60,8 +55,21 @@ router.get('/:id', async (req, res) => {
         attributes: { exclude: ['userId'] },
         through: {
           attributes: ['id', 'read'],
-          where
         }
+      }
+    ]
+  })
+  isResourceInDB(user, req)
+  return res.json(user)
+})
+
+router.get('/:id', async (req, res) => {
+  const user = await User.findByPk(req.params.id, {
+    attributes: { exclude: [''] },
+    include: [
+      {
+        model: Blog,
+        attributes: { exclude: ['userId'] },
       }
     ]
   })
@@ -80,6 +88,22 @@ router.post('/', async (req, res) => {
       error: 'Password must be over 6 characters'
     })
   }
+
+  /*
+    Case insensitive search for the username.
+    Checked here so camelcase usernames are allowed
+  */
+  const nameTaken = await User.findOne({
+    where: {
+      username: { [Op.iLike]: username }
+    }
+  })
+  if (nameTaken) {
+    return res.status(400).json({
+      error: 'This username is already taken.'
+    })
+  }
+
   const passwordHash = await bcrypt.hash(password, 10)
   const user = await User.create({
     username,

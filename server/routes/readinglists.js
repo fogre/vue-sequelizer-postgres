@@ -8,6 +8,15 @@ router.post('/', confirmSession, async (req, res) => {
   isReqBodyValid(['blogId', 'userId'], req.body)
   isAuthorizedUser(req.session, req.body.userId)
 
+  const alreadyExists = await Readinglist.findOne({ where: {
+    userId: req.session.userId,
+    blogId: req.body.blogId
+  } })
+
+  if (alreadyExists) {
+    return res.json({ message: 'already exists' })
+  }
+
   const entry = await Readinglist.create({
     userId: req.session.userId,
     blogId: req.body.blogId

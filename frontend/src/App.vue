@@ -1,11 +1,19 @@
 <script setup>
   import { provide, ref, watch } from "vue"
-  import { getStorage, setStorage } from './utils/localStorage'
+  import { useRouter } from 'vue-router'
+  import { clearStorage, getStorage, setStorage } from './utils/localStorage'
   import { THEMES } from './utils/constants'
   import MainHeader from "./components/Header/MainHeader.vue"
+  import Notification from './components/Modals/Notification.vue'
 
+  const router = useRouter()
   const user = ref(getStorage())
-  const theme = ref('light')
+  const theme = ref('dark')
+  //notification { type, message }
+  const notification = ref({
+    type: 'success',
+    message: 'Contacting backend, this might take a while'
+  })
 
   watch(() => user.value, newVal => {
     if (newVal) {
@@ -17,9 +25,21 @@
     user.value = userInfo
   }
 
+  const handleLogout = error => {
+    if (error.response.status === 401) {
+      clearStorage()
+      setUser(null)
+      router.push('/sign')
+      setNotification('error','Please log in')
+    }
+  }
+
   //instead of refetching user, keep track of likes locally
   const addLike = like => {
-    const newLikes = [...user.value.liked_blogs]
+    let newLikes = []
+    if (user.value.liked_blogs && user.value.liked_blogs.length) {
+      newLikes = [...user.value.liked_blogs]
+    }
     newLikes.push({ id: like.blogId })
     user.value = {
       ...user.value,
@@ -40,16 +60,37 @@
     theme.value = newTheme
   }
 
+  const setNotification = (type, message) => {
+    notification.value = {
+      type: type,
+      message: message
+    }
+  }
+
+  const handleError = error => {
+    console.log(error.message)
+    if (error.response.status === 401) {
+      return handleLogout(error)
+    }
+    setNotification('error', error.message)
+  }
+
   provide('user', {
     user,
     setUser,
     addLike,
-    removeLike
+    removeLike,
+    handleLogout
   })
 
   provide('theme', {
     theme,
     changeTheme
+  })
+
+  provide('notification', {
+    handleError,
+    setNotification
   })
 </script>
 
@@ -67,12 +108,13 @@
       </RouterView>
     </div>
   </div>
-  <p>this is footer</p>
   <div class="app-background" />
+  <Notification :notif="notification" />
 </template>
 
 <style>
   @import './assets/animations.css';
+  @import './assets/formStyles.css';
   @import './assets/listGlobalStyles.css';
 
   .app {
@@ -89,6 +131,7 @@
     --color-primary: v-bind(THEMES[theme].primary);
     --color-secondary: v-bind(THEMES[theme].secondary);
     --color-danger: v-bind(THEMES[theme].danger);
+    --color-success: v-bind(THEMES[theme].success);
     --text-color-main: v-bind(THEMES[theme].textColorMain);
   }
 
@@ -113,4 +156,11 @@
     height: 100%;
   }
 
+  .secondary-color {
+    color: var(--color-secondary);
+  }
+
+  .primary-color {
+    color:  var(--color-primary);
+  }
 </style>

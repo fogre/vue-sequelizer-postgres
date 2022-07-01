@@ -1,3 +1,4 @@
+const { Op } = require('sequelize')
 const bcrypt = require('bcrypt')
 const router = require('express').Router()
 
@@ -22,7 +23,10 @@ router.post('/', async (req, res) => {
           }
         }
       ],
-      where: { username: username }
+      where: { username: {
+        [Op.iLike]: username
+      }
+      }
     })
 
   const passwordCorrect = user === null

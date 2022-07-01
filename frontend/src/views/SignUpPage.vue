@@ -2,22 +2,24 @@
 	import { inject } from 'vue'
 	import { useRouter } from 'vue-router'
 	import { reset } from '@formkit/core'
-	import { signInSchema } from '../assets/formSchemas'
+	import { signUpSchema } from '../assets/formSchemas'
 	import { apiPost } from '../utils/apiService'
 	import { setStorage } from '../utils/localStorage'
+	import Link from '../components/Links/Link.vue'
 
 	const router = useRouter()
 	const { setUser } = inject('user')
 
 	const handleSubmit = async (data, node) => {
 		try {
-			const res = await apiPost('/login', {
+			const res = await apiPost('/users', {
 				username: data.username,
-				password: data.password
+				name: data.name,
+				password: data.passgroup.password
 			})
 			setStorage(res.data)
 			setUser(res.data)
-			reset('loginForm')
+			reset('signupForm')
 			router.push('/profile')
 		} catch (e) {
 			console.log(e.response.data)
@@ -28,18 +30,18 @@
 
 <template>
 	<div class="g-flex-centered">
-		<div class="wrapper">
-		  <FormKit type="form" id='loginForm' @submit="handleSubmit">
-		    <FormKitSchema :schema="signInSchema" />
+		<div class="sign-form-wrapper">
+		  <FormKit type="form" id='signupForm' @submit="handleSubmit">
+		    <FormKitSchema :schema="signUpSchema" />
 		  </FormKit>
+		  <br />
+		  <Link
+		  	:linkType="'route'"
+		  	:linkStyle="'text'"
+		  	:url="'/sign'"
+		  >
+		  	<p class="g-text-centered">Already have an account? Sign in.</p>
+		  </Link>
 		</div>  
 	</div>  
 </template>
-
-<style scoped>
-	.wrapper {
-		padding: 24px 30px;
-		border:  var(--border-large);
-		border-radius: var(--radius-large);
-	}
-</style>

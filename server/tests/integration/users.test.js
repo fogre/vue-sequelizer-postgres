@@ -35,11 +35,11 @@ describe('When using route /api/users', () => {
       expect(res.body[0].likes).toBe(usersByLikes[0].likes)
     })
 
-    test('it returns single user with readinglist', async () => {
+    test('it returns single user with blogs', async () => {
       const res = await api.get(`${route}/${users[users.length-1].id}`)
       expect(res.body.error).toBeFalsy()
       expect(res.body.username).toBe(users[users.length-1].username)
-      expect(res.body.readings).toBeTruthy()
+      expect(res.body.blogs).toBeTruthy()
     })
   })
 

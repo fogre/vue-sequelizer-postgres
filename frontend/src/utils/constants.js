@@ -1,7 +1,8 @@
 const THEME_SHARED_VALUES = {
   primary: 'blue',
   secondary: 'hsl(15deg 67% 63%)',
-  danger: 'red'
+  danger: 'red',
+  success: 'green'
 }
 
 export const THEMES = {
@@ -29,22 +30,30 @@ export const THEMES = {
     colorTransparent: 'hsla(100deg, 100%, 100%, 0.2)',
 
     textColorMain: 'hsl(211, 57%, 14%)',
-    ...THEME_SHARED_VALUES
+
+    primary: 'hsl(218, 100%, 33%)',
+    secondary: 'hsl(15deg 67% 63%)',
     
   },
   dark: {
     backgroundGradient: `linear-gradient(
-      165deg,
-      hsl(0deg 0% 0%) 0%,
-      hsl(60deg 100% 99%) 100%
+      145deg,
+      hsl(240deg 100% 7%) 0%,
+      hsl(232deg 85% 10%) 5%,
+      hsl(225deg 69% 14%) 13%,
+      hsl(219deg 53% 18%) 26%,
+      hsl(212deg 37% 21%) 47%,
+      hsl(203deg 21% 25%) 80%,
+      hsl(197deg 5% 35%) 100%
     )`,
-    backgroundColor: 'black',
-    backgroundTransparent: 'hsla(100deg, 0%, 0%, 0.2)',
-    backgroundTransparentSecondary: 'hsla(0deg, 46%, 48%, 0.5)',
-    colorTransparent: 'hsla(100deg, 100%, 100%, 0.2)',
+    backgroundColor: 'hsl(213, 39%, 18%)',
+    backgroundTransparentPrimary: 'hsla(280, 50%, 80%, 40%)',
+    backgroundTransparentSecondary: 'hsla(280, 50%, 70%, 10%)',
+    colorTransparent: 'hsla(290, 50%, 70%, 20%)',
 
     textColorMain: 'white',
-    ...THEME_SHARED_VALUES
+    primary: 'hsl(213, 70%, 70%)',
+    secondary: 'hsl(23deg 17% 58%)'
     
   }
 }

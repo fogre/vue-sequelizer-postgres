@@ -1,5 +1,10 @@
 <script setup>
 	import BackButton from '../Buttons/BackButton.vue'
+
+	const props = defineProps({
+		isLoading: Boolean,
+		isError: Boolean
+	})
 </script>
 
 <template>
@@ -7,7 +12,9 @@
 		<BackButton />
 		<div class="card-wrapper">
 			<div class="content">
-				<slot />
+				<p v-if="props.isLoading" class="g-flex-centered">Loading...</p>
+				<p v-else-if="props.isError">Oops, error happened!</p>
+				<slot v-else/>
 			</div>
 		</div>
 	</div>
@@ -26,8 +33,10 @@
 		background-color: var(--background-color);
 		padding: var(--padding-main);
 		border-radius: var(--radius-large);
+		border: var(--border-small);
 		position: relative;
 		isolation: isolate;
+		min-height: 300px;
 	}
 
 	.content {

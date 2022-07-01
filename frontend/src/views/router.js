@@ -8,7 +8,11 @@ const router = createRouter({
     },
     {
       path: "/sign",
-      component: () => import("./SignPage.vue"),
+      component: () => import("./SignInPage.vue"),
+    },
+    {
+      path: "/signup",
+      component: () => import("./SignUpPage.vue"),
     },
     {
       path: '/profile',
@@ -29,6 +33,18 @@ const router = createRouter({
     {
       path: '/users',
       component: () => import('./UsersPage.vue')
+    },
+    {
+      path: '/users/:id',
+      component: () => import('./SingleUserPage.vue')
+    },
+    {
+      path: '/authors/:author',
+      component: () => import('./AuthorPage.vue')
+    },
+    {
+      path: '/tags/:id',
+      component: () => import('./TagPage.vue')
     },
     {
       path: '/:pathMatch(.*)*',

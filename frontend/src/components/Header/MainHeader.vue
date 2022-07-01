@@ -1,32 +1,45 @@
 <script setup>
-  import { inject } from 'vue'
+  import { ref } from 'vue'
+  import NavContent from './NavContent.vue'
+  import IconButton from '../Buttons/IconButton.vue'
 
-  const { user } = inject('user')
-  const { theme, changeTheme } = inject('theme')
+  const mobileNavOpen = ref(false)
+
+  const handleMobileNav = () => {
+    mobileNavOpen.value = !mobileNavOpen.value
+  }
 </script>
 
 <template>
   <header>
-    <nav class="nav">
-      <div class="nav-block">
-        <RouterLink to="/" class="nav-link">
-          home
-        </RouterLink>
-        <RouterLink to="/blogs" class="nav-link">
-          blogs
-        </RouterLink>
-        <RouterLink to="/users" class="nav-link">
-          users
-        </RouterLink>  
+    <nav>
+      <div class="nav-desktop">
+        <NavContent />
       </div>
-      <div class="nav-block">
-        <button @click="changeTheme">{{ theme }}</button>
-        <RouterLink v-if="user" to="/profile" class="nav-link left">
-          my profile
-        </RouterLink>
-        <RouterLink v-else to="/sign" class="nav-link left">
-          sign in / up
-        </RouterLink>
+      <div class="nav-mobile">
+        <div class="nav-mobile-button-wrapper">
+          <IconButton
+            @handleClick="handleMobileNav()"
+            :icon=" mobileNavOpen ? 'close' : 'menu'"
+            :iconSize="24"
+            :style="{
+              color: mobileNavOpen ? 'black' : 'white'
+            }"
+          />
+        </div>
+        <Transition :name="'fade'">
+          <div v-if="mobileNavOpen">
+            <div class="nav-mobile-content">
+              <NavContent
+                @closeNav="handleMobileNav()"
+              />
+            </div>
+            <button
+              class="g-unstyled-button close-nav-button"
+              @click="handleMobileNav()"
+            />
+          </div>
+        </Transition>
       </div>
     </nav>
   </header>
@@ -34,6 +47,7 @@
 
 <style scoped>
   header {
+    color: black;
     position: absolute;
     left: 0;
     top: 0;
@@ -41,7 +55,7 @@
     z-index: var(--z-idx-nav);
   }
 
-  nav {
+  .nav-desktop {
     padding: 0 var(--padding-main);
     margin: 0;
     display: flex;
@@ -50,27 +64,38 @@
     background-color: inherit;
     color: white;
     height: var(--nav-header-height);
+
+    @media(max-width: 600px) {
+      display: none;
+    }
   }
 
-  .nav-block {
+  .nav-mobile {
+    @media(min-width: 600px) {
+      display: none;
+    }
+  }
+
+  .nav-mobile-button-wrapper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 10px;
+  }
+
+  .nav-mobile-content {
+    width: 100%;
+    align-items: center;
     display: flex;
-    gap: 2rem;
+    gap: 16px;
+    flex-direction: column;
+    padding: 50px 0 16px;
+    background-color: white;
   }
 
-  .nav-link {
-    color: inherit;
-    text-decoration: none;
-    font-weight: 700;
-
-    &.left {
-      color: var(--color-primary);
-      border-bottom: 2px solid white;
-      padding: 2px 2px;
-    }
-
-    &:hover {
-      color: var(--color-primary);
-      border-color: var(--color-primary);
-    }
+  .close-nav-button {
+    width: 100%;
+    height: 100vh;
+    background: transparent;
   }
 </style>

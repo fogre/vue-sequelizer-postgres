@@ -27,7 +27,21 @@
       "image": "fogre/bloglist-api",
       "hostname": "api",
       "essential": false,
+      "links": ["redis"],
       "memory": 300
+    },
+    {
+      "name": "redis",
+      "image": "redis:alpine",
+      "hostname": "redis",
+      "essential": false,
+      "portMappings": [
+        {
+          "hostPort": 6379,
+          "containerPort": 6379
+        }
+      ],
+      "memory": 500
     }
   ]
 }

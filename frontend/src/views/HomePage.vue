@@ -1,6 +1,6 @@
 <script setup>
   import TopList from '../components/Lists/TopList.vue'
-  import HomeInfo from '../components/HomeInfo/HomeInfo.vue'
+  import HomeInfo from '../components/Other/HomeInfo.vue'
 </script>
 
 <template>

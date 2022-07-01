@@ -10,22 +10,21 @@
 
 	const queryClient = useQueryClient()
 	const { user, addLike, removeLike } = inject('user')
+	const { handleError } = inject('notification')
 
 	const { mutate } = useMutation(() => apiPost(`/blogs/${props.blogId}/likes`), {
 		onError: error => {
-			console.log(error)
+			handleError(error)
 		},
 		onSuccess: async data => {
 			//if data status is 200, a like is added
 			if (data && data.status === 200 && data.data) {
-				console.log('adding like')
 				addLike(data.data)
 			//if data.status is 204 a like is deleted
 			} else if (data && data.status === 204) {
-				console.log('removng like')
 				removeLike(props.blogId)
 			}
-			await queryClient.invalidateQueries('/blogs', props.blogId)
+			await queryClient.invalidateQueries('blogs', props.blogId)
 		}
 	})
 </script>

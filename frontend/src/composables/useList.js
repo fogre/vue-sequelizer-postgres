@@ -15,7 +15,9 @@ export const useList = (data, cacheType, fields, gridColumns) => {
     if (dataValue && dataValue.data) {
       sortedList.value = {
         sortIndex: -1,
-        list: dataValue.data
+        list: cacheType === 'authors'
+          ? dataValue.data.filter(d => d.author)
+          : dataValue.data
       }
     }
   })

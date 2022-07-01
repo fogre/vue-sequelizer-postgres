@@ -52,6 +52,7 @@
 	  border: 2px solid var(--color-primary);
 	  border-radius: var(--radius-small);
 	  width: max-content;
+	  color: var(--color-primary);
 
 	  &:hover {
 	    color: var(--color-primary);

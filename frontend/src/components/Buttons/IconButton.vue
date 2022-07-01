@@ -20,6 +20,7 @@
 		class="g-unstyled-button g-flex-centered"
 		:class="props.buttonStyle"
 	>
+		{{ props.textBefore }}
 		<Icon
 			:icon="props.icon"
 			:size="props.iconSize"
@@ -45,12 +46,21 @@
 	.bordered {
 		margin-bottom: 16px;
 		padding: 6px 10px;
-		border: 2px solid var(--color-primary);
+		border: 1px solid var(--color-primary);
 		border-radius: var(--radius-small);
 
 		&:hover {
 			color: var(--color-primary);
 			outline: 1px solid var(--color-primary);
+		}
+	}
+
+	.secondary {
+		border-color: var(--color-secondary);
+
+		&:hover {
+			color: var(--color-secondary);
+			outline-color: var(--color-secondary);
 		}
 	}
 </style>

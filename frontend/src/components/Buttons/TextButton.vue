@@ -13,7 +13,6 @@
 
 <style scoped>
 	button {
-
 		&:hover {
 			text-decoration: underline;
 		}

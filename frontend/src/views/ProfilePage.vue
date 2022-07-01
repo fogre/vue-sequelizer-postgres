@@ -1,37 +1,51 @@
 <script setup>
-	import { inject } from 'vue'
+	import { inject, watch } from 'vue'
 	import { useRouter } from 'vue-router'
 	import { useQuery } from 'vue-query';
-  import { apiDelete, apiGetUser } from '../utils/apiService'
+  import { apiDelete, apiGetWithCredentials} from '../utils/apiService'
   import { clearStorage } from '../utils/localStorage'
+  import ViewCard from '../components/Cards/ViewCard.vue'
+  import ReadingList from '../components/Lists/ReadingList.vue'
 
   const router = useRouter()
-  const { user, setUser } = inject('user')
-  const { isLoading, isError, data, error } = useQuery(
-  	['users', user.value.id], () => apiGetUser(user.value.id)
+  const { user, setUser, handleLogout } = inject('user')
+  const { isLoading, isError, error, data } = useQuery(
+  	['profile'], () => apiGetWithCredentials('/users/profile')
   )
 
-  const handleSignout = () => {
-  	try {
-  		apiDelete('/login')
-  		clearStorage()
-  		setUser(null)
-  		router.push('/')
-  	} catch (e) {
-  		console.log(e)
+  watch([isError, error], () => {
+  	if (isError) {
+  		handleLogout(error.value)
   	}
-  }
+  })
 </script>
 
 <template>
-	<div>
-		<h1>{{ user.username }}</h1>
-		<p>{{ user.name }}</p>
-		<p v-if="isLoading">Loading...</p>
-		<p v-else-if="isError">{{ error.message }}</p>
-		<ul v-else>
-			<li>{{ data.data }}</li>
-		</ul>
-		<button @click="handleSignout">sign out</button>
+	<div class="g-flex-centered">
+		<div class="g-max-width-wrapper">
+			<h1>Profile</h1>
+			<ViewCard>
+				<p v-if="isLoading">Loading...</p>
+				<p v-else-if="isError">{{ error.message }}</p>
+				<div v-else>
+					<h2 class="secondary-color g-text-uppercase g-margin-bottom">
+						{{ data.data.username }}
+					</h2>
+					<div class="readinglist-wrapper">
+						<h3 class="secondary-color g-text-centered">Reading list</h3>
+						<ReadingList
+							:readinglist="data.data.readings"
+						/>
+					</div>
+				</div>
+			</ViewCard>	
+		</div>
 	</div>
 </template>
+
+
+<style scoped>
+	.readinglist-wrapper {
+		margin: var(--margin-space) 0;
+	}
+</style>

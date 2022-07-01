@@ -5,19 +5,22 @@
       <p>Bloglist is the ultimate social blog listing site!</p>
       <p>Ýou can add blogs, list them and like em to your hearts content.</p>
       <br />
-      <p>Are you the ultimate like master?</p>
-      <p>Share millions of users your favorite blogs, gather likes and win... nothing?</p>
+      <p><strong>Are you the ultimate like master?</strong></p>
+      <p>Share millions of users your favorite blogs, gather likes and win... ?!?!</p>
     </div>
   </div>
+  <footer>
+    <p>This website is a quick demo project to learn the basics of Vue and Sequelize+Postresql</p>
+  </footer>
 </template>
 
 <style scoped>
    .info-wrapper {
-    height: 600px;
-    width: 100vw;
+    width: 100%;
+    min-width: 100vw;
     background-color: white;
     color:  black;
-    padding: var(--padding-main) 0;
+    padding: var(--padding-main) 0 200px;
   }
 
   .info-content {
@@ -25,6 +28,15 @@
     padding: 0 16px;
     max-width: var(--content-max-width);
     text-align: center;
+
+    & strong {
+      color: var(--color-secondary);
+      font-size: 1.1rem;
+    }
+
+    & p {
+      font-family: 'Gantari', sans-serif;
+    }
 
     & h3 {
       color: var(--color-secondary);
@@ -36,5 +48,13 @@
         color: black;
       }
     }
+  }
+
+  footer {
+    background-color: white;
+    width: 100%;
+    text-align: center;
+    color: var(--color-primary);
+    padding-bottom: 16px;
   }
 </style>

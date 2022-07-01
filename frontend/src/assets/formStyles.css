@@ -1,0 +1,70 @@
+/* Custom styles */
+.form-input {
+  border-radius: 6px;
+  padding: 6px 10px;
+  border: 2px solid var(--color-secondary);
+  width: 100%;
+  outline: none;
+
+  &:focus, &:hover {
+    box-shadow: 0px 0px 5px 0px var(--color-secondary);
+  }
+}
+
+.form-label {
+  color: inherit;
+  font-weight: 700;
+}
+
+.form-label-white {
+  color: white;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+/* Formkit styles */
+.formkit-form {
+  & h3 {
+    margin-bottom: 16px;
+  }
+}
+.formkit-wrapper {
+  padding-bottom: 16px;
+
+  & button {
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+    border-radius: 6px;
+    outline-color: none;
+    background-color: inherit;
+    padding: 4px 10px;
+    cursor: pointer;
+
+    &:focus, &:hover {
+      box-shadow: 0px 0px 5px 0px var(--color-primary);    
+    }
+  }
+}
+
+[data-invalid] .formkit-inner {
+  border-radius: 6px;
+  border: 1px solid var(--color-danger);
+}
+
+[data-invalid] .formkit-messages, [error] .formkit-messages {
+  list-style: none;
+  margin: -15px 0 10px 0;
+  padding: 0;
+  color: var(--color-danger);
+  font-size: var(--font-small);
+  text-align: center;
+}
+
+.sign-form-wrapper {
+  margin-top: 15%;
+  padding: var(--margin-space) 30px;
+  border:  var(--border-large);
+  border-radius: var(--radius-large);
+  width: 100%;
+  max-width: 400px;
+}

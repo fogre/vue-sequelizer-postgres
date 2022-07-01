@@ -1,5 +1,6 @@
 <script setup>
   import { computed } from 'vue'
+  import AuthorListItem from './ListItems/AuthorListItem.vue'
   import BlogListItem from './ListItems/BlogListItem.vue'
   import UserListItem from './ListItems/UserListItem.vue'
 
@@ -17,6 +18,7 @@
     const cache = Array.isArray(props.cacheName) ? props.cacheName[0] : props.cacheName
     switch(cache) {
       case 'blogs': return BlogListItem
+      case 'authors': return AuthorListItem
       default: return UserListItem
     }
   })
